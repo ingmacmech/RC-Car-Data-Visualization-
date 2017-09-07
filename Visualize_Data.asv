@@ -2,10 +2,9 @@ clear;
 clc;
 close all;
 %% Add path to sub folders
-addpath('E:\Studium\ElektroUNDKommunicationstechnik\BachelorArbeit\007_Data_Captured\RC Data Evaluation\Test_Data');
-addpath('E:\Studium\ElektroUNDKommunicationstechnik\BachelorArbeit\007_Data_Captured\RC Data Evaluation\Data');
-
-
+currentPath = pwd;
+addpath(genpath(currentPath));
+clear currentPath;
 
 %% Set converting factors for sensor data 
 
@@ -170,6 +169,20 @@ for n = 1 : nFiles
             'HorizontalAlignment', 'center',...
             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
     hold on
+        scatter(data.ing.(dataName{n})(:,7),...
+                data.ing.(dataName{n})(:,6), 12,...
+                data.ing.(dataName{n})(:,8),'filled')
+            
+        xlabel('y-Axis g')
+        ylabel('x-Axis g')
+        grid minor
+        
+        colorbar;       % Set color bar 
+        colormap jet;   % Set colormap to red and blue
+        
+        axis square;
+        axis([-2 2 -2 2]);
+        caxis([-2 2]);
         
         
     

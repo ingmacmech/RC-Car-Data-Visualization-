@@ -2,10 +2,9 @@ clear;
 clc;
 close all;
 %% Add path to sub folders
-addpath('E:\Studium\ElektroUNDKommunicationstechnik\BachelorArbeit\007_Data_Captured\RC Data Evaluation\Test_Data');
-addpath('E:\Studium\ElektroUNDKommunicationstechnik\BachelorArbeit\007_Data_Captured\RC Data Evaluation\Data');
-
-
+currentPath = pwd;
+addpath(genpath(currentPath));
+clear currentPath;
 
 %% Set converting factors for sensor data 
 
@@ -108,7 +107,7 @@ for n = 1 : nFiles
     figure('units','normalized','outerposition',[0 0 1 1])
             annotation('textbox', [0 0.9 1 0.1], ...
             'String',...
-            strcat({''},dataName{n},{' time domain'}),...
+            strcat({''},dataName{n},{' - Time Domain'}),...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center',...
             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
@@ -174,9 +173,25 @@ for n = 1 : nFiles
                 data.ing.(dataName{n})(:,6), 12,...
                 data.ing.(dataName{n})(:,8),'filled')
             
-        xlabel()
-        grid minor 
+        xlabel('y-Axis g')
+        ylabel('x-Axis g')
+        grid minor
         
+        colorbar;       % Set color bar 
+        colormap jet;   % Set colormap to red and blue
+        
+        axis square;
+        axis([-2 2 -2 2]);
+        caxis([-2 2]);
+        viscircles([0 0], 2, 'Color', 'k', 'LineWidth', 1);
+        viscircles([0 0], 1.5, 'Color', 'k', 'LineWidth', 1,...
+                             'LineStyle', ':')
+        viscircles([0 0], 1, 'Color', 'k', 'LineWidth', 1,...
+                             'LineStyle', ':')
+        viscircles([0 0], 0.5, 'Color', 'k', 'LineWidth', 1,...
+                             'LineStyle', ':')
+        
+        hold off
     
 end
 
