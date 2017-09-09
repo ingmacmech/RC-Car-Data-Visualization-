@@ -113,6 +113,44 @@ for n = 1 : nFiles
     end
 end
 
+%% Calculate Power Spectral Density for acceleration and gyro data
+for n = 1 : nFiles
+    for m = 1 : 6
+        switch m
+            case 1
+                [p,f] = pwelch(data.ing.(dataName{n})(:,ax),...
+                               [],[],[],samplingFreq);
+                data.psd.(dataName{n}) = [f, p];
+                clear p f;
+            case 2
+                [p,f] = pwelch(data.ing.(dataName{n})(:,ay),...
+                               [],[],[],samplingFreq);
+                data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                clear p f;
+            case 3
+                [p,f] = pwelch(data.ing.(dataName{n})(:,az),...
+                               [],[],[],samplingFreq);
+                data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                clear p f;
+            case 4
+                [p,f] = pwelch(data.ing.(dataName{n})(:,gx),...
+                               [],[],[],samplingFreq);
+                data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                clear p f;
+            case 5
+                [p,f] = pwelch(data.ing.(dataName{n})(:,gy),...
+                               [],[],[],samplingFreq);
+                data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                clear p f;
+            case 6
+                [p,f] = pwelch(data.ing.(dataName{n})(:,gz),...
+                               [],[],[],samplingFreq);
+                data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                clear p f;
+        end
+    end
+end
+
 %% Plot data vs time
 for n = 1 : nFiles
     figure('units','normalized','outerposition',[0 0 1 1])
@@ -377,5 +415,65 @@ for n = 1 : nFiles
         xlim([-2 2])
         ylabel('Occurencies')
         xlabel('Acceleration z-Axis')
+        hold off
+end
+
+%% Plot power spectral density
+for n = 1 : nFiles
+    figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            strcat({''},dataName{n},...
+           {' Welch Power Spectral Density Estimation'}),...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+     
+     subplot(2,3,1)
+        hold on
+        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,2)));
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        
+        hold off
+        
+     subplot(2,3,2)
+        hold on
+        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,3)));
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        
+        hold off
+        
+     subplot(2,3,3)
+        hold on
+        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,4)));
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        
+        hold off
+        
+    subplot(2,3,4)
+        hold on
+        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,5)));
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        
+        hold off
+        
+    subplot(2,3,5)
+        hold on
+        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,6)));
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        
+        hold off
+        
+    subplot(2,3,6)
+        hold on
+        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,7)));
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        
         hold off
 end
