@@ -426,6 +426,7 @@ for n = 1 : nFiles
         ylabel('Normalized Occurencies')
         xlabel('Acceleration x-Axis')
         legend(dataName(n,:),'interpreter','none')
+        title('x-Axis Acceleration')
         hold off
      
      subplot(3,1,2)
