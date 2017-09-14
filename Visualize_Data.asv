@@ -439,20 +439,18 @@ for n = 1 : nFiles
         xlim([-2 2])
         ylabel('Normalized Occurencies')
         xlabel('Acceleration y-Axis')
-        legend(dataName(n,:),'interpreter','none')
         hold off
 
      subplot(3,1,3)
         hold on
         for m = 1 : mFiles
-            h1 = histogram(data.ing.(dataName{n,m})(:,az));
+            histogram(data.ing.(dataName{n,m})(:,az));
             h1.Normalization = 'probability';
             h1.BinWidth = 0.1;
         end      
         xlim([-2 2])
         ylabel('Normalized Occurencies')
         xlabel('Acceleration z-Axis')
-        legend(dataName(n,:),'interpreter','none')
         hold off
 end
 
