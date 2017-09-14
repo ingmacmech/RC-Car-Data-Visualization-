@@ -139,34 +139,34 @@ for n = 1 : nFiles
             for i = 1 : 6
                 switch i
                     case 1
-                        [p,f] = pwelch(data.ing.(dataName{n})(:,ax),...
+                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,ax),...
                                        [],[],[],samplingFreq);
-                        data.psd.(dataName{n}) = [f, p];
+                        data.psd.(dataName{n,m}) = [f, p];
                         clear p f;
                     case 2
-                        [p,f] = pwelch(data.ing.(dataName{n})(:,ay),...
+                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,ay),...
                                        [],[],[],samplingFreq);
-                        data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 3
-                        [p,f] = pwelch(data.ing.(dataName{n})(:,az),...
+                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,az),...
                                        [],[],[],samplingFreq);
-                        data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 4
-                        [p,f] = pwelch(data.ing.(dataName{n})(:,gx),...
+                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,gx),...
                                        [],[],[],samplingFreq);
-                        data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 5
-                        [p,f] = pwelch(data.ing.(dataName{n})(:,gy),...
+                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,gy),...
                                        [],[],[],samplingFreq);
-                        data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 6
-                        [p,f] = pwelch(data.ing.(dataName{n})(:,gz),...
+                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,gz),...
                                        [],[],[],samplingFreq);
-                        data.psd.(dataName{n}) = [data.psd.(dataName{n}), p];
+                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
                         clear p f;
                 end
             end
@@ -410,11 +410,10 @@ for n = 1 : nFiles
      figure('units','normalized','outerposition',[0 0 1 1])
             annotation('textbox', [0 0.9 1 0.1], ...
             'String',...
-            strcat({''},dataName{n},...
-           {' Acceleration Histograms'}),...
+            ' Acceleration Histograms',...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center',...
-            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none');
         
      subplot(3,1,1)
         hold on
@@ -461,57 +460,68 @@ for n = 1 : nFiles
     figure('units','normalized','outerposition',[0 0 1 1])
             annotation('textbox', [0 0.9 1 0.1], ...
             'String',...
-            strcat({''},dataName{n},...
-           {' Welch Power Spectral Density Estimation'}),...
+            ' Welch Power Spectral Density Estimation',...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center',...
             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
      
      subplot(2,3,1)
         hold on
-        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,2)));
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,2)));
+        end
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
-        
+        legend(dataName(n,:),'interpreter','none')
         hold off
         
      subplot(2,3,2)
         hold on
-        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,3)));
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,3)));
+        end
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
-        
+        legend(dataName(n,:),'interpreter','none')
         hold off
         
      subplot(2,3,3)
         hold on
-        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,4)));
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,4)));
+        end
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
-        
+        legend(dataName(n,:),'interpreter','none')
         hold off
         
     subplot(2,3,4)
         hold on
-        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,5)));
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,5)));
+        end
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
-        
+        legend(dataName(n,:),'interpreter','none')
         hold off
         
     subplot(2,3,5)
         hold on
-        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,6)));
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,6)));
+        end
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
-        
+        legend(dataName(n,:),'interpreter','none')
         hold off
         
     subplot(2,3,6)
         hold on
-        plot(data.psd.(dataName{n})(:,1),db(data.psd.(dataName{n})(:,7)));
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,7)));
+        end
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
-        
+        legend(dataName(n,:),'interpreter','none')
         hold off
 end
