@@ -8,12 +8,18 @@ clear currentPath;
 
 %% Set converting factors for sensor data 
 
-nullPostThrottle = 4555;% Null position value throttle
-nullPosSteering = 4648; % Null position value steering
-accMult = 1 / 16384;    % Conversion factor between int and g
-gyroMult = 1/ 65.5;     % Converstion factor between int and °/s
-timerFreq = 18e6;       % Timer frequency for wheel speed
-samplingFreq = 20;      % Sampling frequency in Hz
+nullPostThrottle = 4572;    % Null position value throttle
+maxPosThrottle = 5998;      % Max value for throttle
+minPosThrottle = 3064;      % Min value for throttle
+
+nullPosSteering = 4614;     % Null position value steering
+maxPosSteering = 5954;      % Max value for steering
+minPosSteering = 3072;      % Min value for steering
+
+accMult = 1 / 16384;        % Conversion factor between int and g
+gyroMult = 1/ 65.5;         % Converstion factor between int and °/s
+timerFreq = 18e6;           % Timer frequency for wheel speed
+samplingFreq = 20;          % Sampling frequency in Hz
 
 %% List of data to open and data ending
 dataType = {'.txt'};
