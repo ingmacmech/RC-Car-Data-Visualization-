@@ -10,9 +10,6 @@ clear currentPath;
 % to create cal struct run Calibration.m first
 load('cal');
 
-%% Set converting factors for sensor data 
-
-
 %% List of data to open and data ending
 dataType = {'.txt'};
 
@@ -139,8 +136,54 @@ for n = 1 : nFiles
     end
 end
 
+%% Filter acceleration and gyro data
+data.filtered = struct;
+f = Test_Filter();
+for n = 1 : nFiles
+    for m = 1 : mFiles
+        if ~(isfield(data.filtered, dataName{n,m}))
+            for i = 1 : 6
+               switch i
+                   case 1
+                       temp = filter(f, data.ing.(dataName{n,m})(:,ax));
+                       data.filtered.(dataName{n,m}) =...
+                                    [data.ing.(dataName{n,m})(:,t), temp];
+                       clear temp;
+                   case 2
+                       temp = filter(f, data.ing.(dataName{n,m})(:,ay));
+                       data.filtered.(dataName{n,m}) =...
+                                    [data.filtered.(dataName{n,m}), temp];
+                       clear temp;
+                   case 3
+                       temp = filter(f, data.ing.(dataName{n,m})(:,az));
+                       data.filtered.(dataName{n,m}) =...
+                                    [data.filtered.(dataName{n,m}), temp];
+                       clear temp;
+                   case 4
+                       temp = filter(f, data.ing.(dataName{n,m})(:,gx));
+                       data.filtered.(dataName{n,m}) =...
+                                    [data.filtered.(dataName{n,m}), temp];
+                       clear temp; 
+                   case 5
+                       temp = filter(f, data.ing.(dataName{n,m})(:,gy));
+                       data.filtered.(dataName{n,m}) =...
+                                    [data.filtered.(dataName{n,m}), temp];
+                       clear temp;
+                   case 6
+                       temp = filter(f, data.ing.(dataName{n,m})(:,gz));
+                       data.filtered.(dataName{n,m}) =...
+                                    [data.filtered.(dataName{n,m}), temp];
+                       clear temp;
+               end
+            end
+        end
+    end
+end
+
 %% Calculate Power Spectral Density for acceleration and gyro data
 data.psd = struct;
+
+
 for n = 1 : nFiles
     for m = 1 : mFiles
         if ~(isfield(data.psd, dataName{n,m}))
