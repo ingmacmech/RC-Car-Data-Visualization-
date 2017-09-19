@@ -1,6 +1,11 @@
+%% TODO:
+% -- Optimize Filter
+
+%% Clear all resources
 clear;
 clc;
 close all;
+
 %% Add path to sub folders
 currentPath = pwd;
 addpath(genpath(currentPath));
@@ -75,60 +80,74 @@ for n = 1 : nFiles
                 switch(i)
                     case 1
                         % Copy time vektor
-                        data.ing.(dataName{n,m}) = data.raw.(dataName{n,m})(:,t);
+                        data.ing.(dataName{n,m}) =...
+                                            data.raw.(dataName{n,m})(:,t);
                     case 2
                         % Convert throttle data
-                        %temp = data.raw.(dataName{n,m})(:,thr) - nullPostThrottle;
-                        temp = polyval(cal.throttle.polyVal, data.raw.(dataName{n,m})(:,thr));
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = polyval(cal.throttle.polyVal,...
+                                       data.raw.(dataName{n,m})(:,thr));
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 3
                         % Convert steering data
-                        %temp = data.raw.(dataName{n,m})(:,ste) - nullPosSteering;
-                        temp = polyval(cal.steering.polyVal, data.raw.(dataName{n,m})(:,ste));
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = polyval(cal.steering.polyVal,...
+                                       data.raw.(dataName{n,m})(:,ste));
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 4
-                        % Convert wheel speed front left data from int to 1/min
-                        %temp = ((data.raw.(dataName{n,m})(:,nFL)*2/timerFreq).^(-1))*60;
-                        temp = (cal.wheel.n ./ data.raw.(dataName{n,m})(:,nFL));
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                   % Convert wheel speed front left data from int to 1/min
+                        temp = (cal.wheel.n ./...
+                                data.raw.(dataName{n,m})(:,nFL));
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 5
-                        % Convert wheel speed front right data from int to 1/min
-                        %temp = ((data.raw.(dataName{n,m})(:,nFR)*2/timerFreq).^(-1))*60;
-                        temp = (cal.wheel.n ./ data.raw.(dataName{n,m})(:,nFR));
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                   % Convert wheel speed front right data from int to 1/min     
+                        temp = (cal.wheel.n ./...
+                                data.raw.(dataName{n,m})(:,nFR));
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 6
                         % Convert acceleration data x-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,ax) * cal.acc.mult;
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = data.raw.(dataName{n,m})(:,ax)*cal.acc.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 7
                         % Convert acceleration data y-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,ay) * cal.acc.mult;
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = data.raw.(dataName{n,m})(:,ay)*cal.acc.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 8
                         % Convert acceleration data z-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,az) * cal.acc.mult;
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = data.raw.(dataName{n,m})(:,az)*cal.acc.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 9
                         % Convert gyroscope data x-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,gx) * cal.gyro.mult;
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = data.raw.(dataName{n,m})(:,gx) *...
+                                                             cal.gyro.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 10
                         % Convert gyroscope data y-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,gy) * cal.gyro.mult;
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = data.raw.(dataName{n,m})(:,gy) *...
+                                                             cal.gyro.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 11
                         % Convert gyroscope data z-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,gz) * cal.gyro.mult;
-                        data.ing.(dataName{n,m}) = [data.ing.(dataName{n,m}), temp];
+                        temp = data.raw.(dataName{n,m})(:,gz) *...
+                                                             cal.gyro.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
                         clear temp;
                 end 
             end
@@ -197,27 +216,32 @@ for n = 1 : nFiles
                     case 2
                         [p,f] = pwelch(data.ing.(dataName{n,m})(:,ay),...
                                        [],[],[],cal.settings.samplingFreq);
-                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
+                        data.psd.(dataName{n,m}) =...
+                                             [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 3
                         [p,f] = pwelch(data.ing.(dataName{n,m})(:,az),...
                                        [],[],[],cal.settings.samplingFreq);
-                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
+                        data.psd.(dataName{n,m}) =...
+                                             [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 4
                         [p,f] = pwelch(data.ing.(dataName{n,m})(:,gx),...
                                        [],[],[],cal.settings.samplingFreq);
-                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
+                        data.psd.(dataName{n,m}) =...
+                                             [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 5
                         [p,f] = pwelch(data.ing.(dataName{n,m})(:,gy),...
                                        [],[],[],cal.settings.samplingFreq);
-                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
+                        data.psd.(dataName{n,m}) =...
+                                             [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 6
                         [p,f] = pwelch(data.ing.(dataName{n,m})(:,gz),...
                                        [],[],[],cal.settings.samplingFreq);
-                        data.psd.(dataName{n,m}) = [data.psd.(dataName{n,m}), p];
+                        data.psd.(dataName{n,m}) =...
+                                             [data.psd.(dataName{n,m}), p];
                         clear p f;
                 end
             end
@@ -230,21 +254,23 @@ for n = 1 : nFiles
     for m = 1 : mFiles
         % Check if the data has alredy been ploted. If not plot it
         if (data.ploted.(dataName{n,m}) ~= 1)
-            figure('units','normalized','outerposition',[0 0 1 1])
-                    annotation('textbox', [0 0.9 1 0.1], ...
-                    'String',...
-                    strcat({''},dataName{n,m},{' - Time Domain'}),...
-                    'EdgeColor', 'none', ...
-                    'HorizontalAlignment', 'center',...
-                    'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+          figure('units','normalized','outerposition',[0 0 1 1])
+                  annotation('textbox', [0 0.9 1 0.1], ...
+                  'String',...
+                  strcat({''},dataName{n,m},{' - Time Domain'}),...
+                  'EdgeColor', 'none', ...
+                  'HorizontalAlignment', 'center',...
+                  'FontSize',12, 'FontWeight', 'bold','interpreter','none')
 
             subplot(4,1,1)
                 hold on
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,thr))
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,ste))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,thr))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,ste))
                 title('Steering and Throttle')
-                xlabel('Time s')
-                ylabel('-')
+                xlabel('Time (s)')
+                ylabel('(-)')
                 legend('Throttle', 'Steering')
                 grid minor
                 ylim([-1.5 1.5])
@@ -252,23 +278,28 @@ for n = 1 : nFiles
 
             subplot(4,1,2)
                 hold on
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,nFL))
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,nFR))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,nFL))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,nFR))
                 title('Wheel Speed')
-                xlabel('Time s')
-                ylabel('1/min')
+                xlabel('Time (s)')
+                ylabel('(1/min)')
                 legend('Front left','Front right')
                 grid minor
                 hold off
 
              subplot(4,1,3)
                 hold on
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,ax))
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,ay))
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,az))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,ax))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,ay))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,az))
                 title('Acceleration')
-                xlabel('Time s')
-                ylabel('g')
+                xlabel('Time (s)')
+                ylabel('(g)')
                 legend('x-Axis','y-Axis','z-Axis')
                 grid minor
                 ylim([-(cal.acc.range+0.5), cal.acc.range+0.5])
@@ -276,12 +307,15 @@ for n = 1 : nFiles
 
              subplot(4,1,4)
                 hold on
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,gx))
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,gy))
-                plot(data.ing.(dataName{n,m})(:,t), data.ing.(dataName{n,m})(:,gz))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,gx))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,gy))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,gz))
                 title('Gyroscope')
-                xlabel('Time s')
-                ylabel('°/s')
+                xlabel('Time (s)')
+                ylabel('(°/s)')
                 legend('x-Axis','y-Axis','z-Axis')
                 grid minor
                 ylim([-(cal.gyro.range+50), cal.gyro.range+50])
@@ -289,6 +323,106 @@ for n = 1 : nFiles
                 
                 %% Set ploted flag
                 data.ploted.(dataName{n,m}) = 1;
+        end
+    end
+end
+%% Plot filtered data
+for n = 1 : nFiles
+    for m = 1 : mFiles
+        if (data.ploted.(dataName{n,m}) ~= 2)
+           figure('units','normalized','outerposition',[0 0 1 1])
+                   annotation('textbox', [0 0.9 1 0.1], ...
+                  'String',...
+                   strcat({''},dataName{n,m},{' -Check filtered Data'}),...
+                  'EdgeColor', 'none', ...
+                  'HorizontalAlignment', 'center',...
+                  'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+            
+            subplot(6,1,1)
+                hold on
+                plot(data.filtered.(dataName{n,m})(:,1),...
+                     data.filtered.(dataName{n,m})(:,2))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,ax))
+                
+                title('Acceleration x-Axis')
+                xlabel('Time (s)')
+                ylabel('(g)')
+                legend('filtered','orginal')
+                ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
+                hold off
+                
+            subplot(6,1,2)
+                hold on
+                plot(data.filtered.(dataName{n,m})(:,1),...
+                     data.filtered.(dataName{n,m})(:,3))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,ay))
+                
+                title('Acceleration y-Axis')
+                xlabel('Time (s)')
+                ylabel('(g)')
+                legend('filtered','orginal')
+                ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
+                hold off
+                            
+            subplot(6,1,3)
+                hold on
+                plot(data.filtered.(dataName{n,m})(:,1),...
+                     data.filtered.(dataName{n,m})(:,4))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,az))
+                
+                title('Acceleration z-Axis')
+                xlabel('Time (s)')
+                ylabel('(g)')
+                legend('filtered','orginal')
+                ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
+                hold off
+            
+           subplot(6,1,4)
+                hold on
+                plot(data.filtered.(dataName{n,m})(:,1),...
+                     data.filtered.(dataName{n,m})(:,5))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,gx))
+                
+                title('Gyroscope x-Axis')
+                xlabel('Time (s)')
+                ylabel('(°/s)')
+                legend('filtered','orginal')
+                ylim([-(cal.gyro.range+50) cal.gyro.range+50])
+                hold off
+            
+           subplot(6,1,5)
+                hold on
+                plot(data.filtered.(dataName{n,m})(:,1),...
+                     data.filtered.(dataName{n,m})(:,6))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,gy))
+                
+                title('Gyroscope y-Axis')
+                xlabel('Time (s)')
+                ylabel('(°/s)')
+                legend('filtered','orginal')
+                ylim([-(cal.gyro.range+50) cal.gyro.range+50])
+                hold off
+                 
+          subplot(6,1,6)
+                hold on
+                plot(data.filtered.(dataName{n,m})(:,1),...
+                     data.filtered.(dataName{n,m})(:,7))
+                plot(data.ing.(dataName{n,m})(:,t),...
+                     data.ing.(dataName{n,m})(:,gz))
+                
+                title('Gyroscope z-Axis')
+                xlabel('Time (s)')
+                ylabel('(°/s)')
+                legend('filtered','orginal')
+                ylim([-(cal.gyro.range+50) cal.gyro.range+50])
+                hold off
+                
+            data.ploted.(dataName{n,m}) = 2;
         end
     end
 end
@@ -308,8 +442,8 @@ for n = 1 : nFiles
                     data.ing.(dataName{n,m})(:,ax),20,...
                     data.ing.(dataName{n,m})(:,az),markerType{m});
         end
-        xlabel('y-Axis g')
-        ylabel('x-Axis g')
+        xlabel('y-Axis (g)')
+        ylabel('x-Axis (g)')
         grid minor
         
         colorbar;       % Set color bar 
@@ -348,14 +482,14 @@ for n = 1 : nFiles
            title('x-Axis acceleration and throttle')
            yyaxis left
            plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,ax));
-           ylabel('g')
+           ylabel('(g)')
            ylim([-2 2])
            grid minor
            
            yyaxis right
            plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,thr));
            ylabel('-')
-           xlabel('Time s')
+           xlabel('Time (s)')
            ylim([-1.5 1.5])
            legend('x-Axis Acceleration','Throttle')
            hold off
@@ -365,14 +499,14 @@ for n = 1 : nFiles
            title('y-Axis acceleration and steering')
            yyaxis left
            plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,ay));
-           ylabel('g')
+           ylabel('(g)')
            ylim([-2 2])
            grid minor
            
            yyaxis right
            plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,ste));
-           ylabel('Steering -')
-           xlabel('Time s')
+           ylabel('(-)')
+           xlabel('Time (s)')
            ylim([-1.5 1.5])
            legend('y-Axis Acceleration','Steering')
            hold off
@@ -382,14 +516,14 @@ for n = 1 : nFiles
            title('z-Axis acceleration and throttle')
            yyaxis left
            plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,az));
-           ylabel('g')
+           ylabel('(g)')
            ylim([-2 2])
            grid minor
            
            yyaxis right
            plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,thr));
-           ylabel('Throttle -')
-           xlabel('Time s')
+           ylabel('(-)')
+           xlabel('Time (s)')
            ylim([-1.5 1.5])
            legend('z-Axis Acceleration','Throttle')
            hold off
@@ -505,10 +639,9 @@ for n = 1 : nFiles
             h1.BinWidth = 0.1;
         end
         xlim([-2 2])
-        ylabel('Normalized Occurencies')
-        xlabel('Acceleration x-Axis')
+        ylabel('Normalized Occurencies (-)')
+        xlabel('Acceleration x-Axis (g)')
         legend(dataName(n,:),'interpreter','none')
-        title('x-Axis Acceleration')
         hold off
      
      subplot(3,1,2)
@@ -519,8 +652,8 @@ for n = 1 : nFiles
             h1.BinWidth = 0.1;
         end      
         xlim([-2 2])
-        ylabel('Normalized Occurencies')
-        xlabel('Acceleration y-Axis')
+        ylabel('Normalized Occurencies (-)')
+        xlabel('Acceleration y-Axis (g)')
         legend(dataName(n,:),'interpreter','none')
         hold off
 
@@ -532,8 +665,8 @@ for n = 1 : nFiles
             h1.BinWidth = 0.1;
         end      
         xlim([-2 2])
-        ylabel('Normalized Occurencies')
-        xlabel('Acceleration z-Axis')
+        ylabel('Normalized Occurencies (-)')
+        xlabel('Acceleration z-Axis (g)')
         legend(dataName(n,:),'interpreter','none')
         hold off
 end
@@ -551,8 +684,10 @@ for n = 1 : nFiles
      subplot(2,3,1)
         hold on
         for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,2)));
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,2)));
         end
+        title('Acceleration x-Axis')
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
         legend(dataName(n,:),'interpreter','none')
@@ -561,8 +696,10 @@ for n = 1 : nFiles
      subplot(2,3,2)
         hold on
         for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,3)));
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,3)));
         end
+        title('Acceleration y-Axis')
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
         legend(dataName(n,:),'interpreter','none')
@@ -571,8 +708,10 @@ for n = 1 : nFiles
      subplot(2,3,3)
         hold on
         for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,4)));
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,4)));
         end
+        title('Acceleration z-Axis')
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
         legend(dataName(n,:),'interpreter','none')
@@ -581,8 +720,10 @@ for n = 1 : nFiles
     subplot(2,3,4)
         hold on
         for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,5)));
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,5)));
         end
+        title('Gyroscope x-Axis')
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
         legend(dataName(n,:),'interpreter','none')
@@ -591,8 +732,10 @@ for n = 1 : nFiles
     subplot(2,3,5)
         hold on
         for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,6)));
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,6)));
         end
+        title('Gyroscope y-Axis')
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
         legend(dataName(n,:),'interpreter','none')
@@ -601,8 +744,10 @@ for n = 1 : nFiles
     subplot(2,3,6)
         hold on
         for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),db(data.psd.(dataName{n,m})(:,7)));
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,7)));
         end
+        title('Gyroscope z-Axis')
         xlabel('Frequency (Hz)')
         ylabel('Power/Frequency (db/Hz)')
         legend(dataName(n,:),'interpreter','none')
