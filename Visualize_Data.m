@@ -18,9 +18,10 @@ load('cal');
 %% List of data to open and data ending
 dataType = {'.txt'};
 
-dataName = {'LOG0_Test' , 'Test_0g' ;
-            'LOG1_Test' , 'Test_0g' ;
-            'LOG2_test' , 'Test_0g'
+dataName = {'Test1_0g_HV_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test1_0g_HV_0grad_3' , 'Test1_0g_HV_0grad_4';
+            'Test2_900gH_0grad_1' , 'Test2_900gH_0grad_2' , 'Test2_900gH_0grad_3' , 'Test2_900gH_0grad_4';
+            'Test1_0g_HV_0grad_1' , 'Test2_900gH_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test2_900gH_0grad_2';
+            'Test1_0g_HV_0grad_3' , 'Test2_900gH_0grad_3' , 'Test1_0g_HV_0grad_4' , 'Test2_900gH_0grad_4'
              };
            
 nFiles = size(dataName,1);  % How many plots
