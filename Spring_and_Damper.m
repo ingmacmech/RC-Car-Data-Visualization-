@@ -2,7 +2,11 @@
 clc;
 clear;
 close all;
-% Data 
+
+%% Save Plots
+savePlots = false;
+
+%% Data 
 s = [0 3 6 9 12 15]';
 front_right = [  0    0   0   0   0;
                 142  142 141 142 143;
@@ -60,8 +64,8 @@ text(5,2,['Federkonstannte [k] = ',...
           'HorizontalAlignment','left','interpreter','latex');
 hold off
 grid minor
-ylabel('Kraft (N)')
-xlabel('Weg (mm)')
+ylabel('\Delta Kraft (N)')
+xlabel('\Delta Weg (mm)')
 title('Federkennlinie vorne links')
 legend('Data','Fit','Location','southeast')
 
@@ -80,8 +84,8 @@ text(5,2,['Federkonstannte [k] = ',...
           'HorizontalAlignment','left','interpreter','latex');
 hold off
 grid minor
-ylabel('Kraft (N)')
-xlabel('Weg (mm)')
+ylabel('\Delta Kraft (N)')
+xlabel('\Delta Weg (mm)')
 title('Federkennlinie vorne rechts')
 legend('Data','Fit','Location','southeast')
 
@@ -100,8 +104,8 @@ text(7,2,['Federkonstannte [k] = ',...
 
 hold off
 grid minor
-ylabel('Kraft (N)')
-xlabel('Weg (mm)')
+ylabel('\Delta Kraft (N)')
+xlabel('\Delta Weg (mm)')
 title('Federkennlinie hinten links')
 legend('Data','Fit','Location','southeast')
 
@@ -121,10 +125,17 @@ text(7,2,['Federkonstannte [k] = ',...
 
 hold off
 grid minor
-ylabel('Kraft (N)')
-xlabel('Weg (mm)')
+ylabel('\Delta Kraft (N)')
+xlabel('\Delta Weg (mm)')
 title('Federkennlinie hinten rechts')
 legend('Data','Fit','Location','southeast')
+if(savePlots == true)
+    h = gcf;
+    set(h, 'PaperOrientation','landscape');
+    set(h,'PaperUnits' ,'normalized');
+    set(h, 'PaperPosition', [0 0 1 1]);
+    print(gcf, '-dpdf', 'Federkennlinien')
+end
 
 figure('units','normalized','outerposition',[0 0 1 1])
 hold on
@@ -135,6 +146,14 @@ plot(s,f_rear_right.Fitted)
 hold off
 grid minor
 title('Vergleich Federkennlinien')
-ylabel('Kraft (N)')
-xlabel('Weg (mm)')
+ylabel('\Delta Kraft (N)')
+xlabel('\Delta Weg (mm)')
 legend('FL','FR','HL','HR','Location','southeast')
+
+if(savePlots == true)
+    h = gcf;
+    set(h, 'PaperOrientation','landscape');
+    set(h,'PaperUnits' ,'normalized');
+    set(h, 'PaperPosition', [0 0 1 1]);
+    print(gcf, '-dpdf', 'Federkennlinien_Vergleich')
+end
