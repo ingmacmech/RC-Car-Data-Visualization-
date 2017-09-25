@@ -55,8 +55,9 @@ plot(s, front_left(:,4), '+b','HandleVisibility','off')
 plot(s, front_left(:,5), '+b')
 plot(s, f_front_left.Fitted,'--r')
 text(5,2,['Federkonstannte [k] = ',...
-                            num2str(f_front_left.Coefficients.Estimate) ,'$\frac{N}{mm}$'],...
-                           'HorizontalAlignment','left','interpreter','latex');
+          num2str(f_front_left.Coefficients.Estimate) ,...
+          '$\frac{N}{mm}$'],...
+          'HorizontalAlignment','left','interpreter','latex');
 hold off
 grid minor
 ylabel('Kraft (N)')
@@ -73,6 +74,10 @@ plot(s, front_right(:,3), '+b','HandleVisibility','off')
 plot(s, front_right(:,4), '+b','HandleVisibility','off')
 plot(s, front_right(:,5), '+')
 plot(s, f_front_right.Fitted,'--r')
+text(5,2,['Federkonstannte [k] = ',...
+          num2str(f_front_right.Coefficients.Estimate) ,...
+          '$\frac{N}{mm}$'],...
+          'HorizontalAlignment','left','interpreter','latex');
 hold off
 grid minor
 ylabel('Kraft (N)')
@@ -88,6 +93,11 @@ plot(s, rear_left(:,3), '+b','HandleVisibility','off')
 plot(s, rear_left(:,4), '+b','HandleVisibility','off')
 plot(s, rear_left(:,5), '+b')
 plot(s, f_rear_left.Fitted,'--r')
+text(7,2,['Federkonstannte [k] = ',...
+          num2str(f_rear_left.Coefficients.Estimate) ,...
+          '$\frac{N}{mm}$'],...
+          'HorizontalAlignment','left','interpreter','latex');
+
 hold off
 grid minor
 ylabel('Kraft (N)')
@@ -104,6 +114,11 @@ plot(s, rear_right(:,3), '+b','HandleVisibility','off')
 plot(s, rear_right(:,4), '+b','HandleVisibility','off')
 plot(s, rear_right(:,5), '+b')
 plot(s, f_rear_right.Fitted,'--r')
+text(7,2,['Federkonstannte [k] = ',...
+          num2str(f_rear_right.Coefficients.Estimate) ,...
+          '$\frac{N}{mm}$'],...
+          'HorizontalAlignment','left','interpreter','latex');
+
 hold off
 grid minor
 ylabel('Kraft (N)')
