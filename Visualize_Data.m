@@ -288,6 +288,7 @@ for n = 1 : nFiles
                 ylabel('(1/min)')
                 legend('Front left','Front right')
                 grid minor
+                ylim([0 3000])
                 hold off
 
              subplot(4,1,3)
