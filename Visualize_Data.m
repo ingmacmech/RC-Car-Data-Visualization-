@@ -28,6 +28,9 @@ nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
 nColumns = 11;              % The number of columns in the data file + 1
 
+%% Plot Controlls
+filteredOverlay = true;
+
 %% Columns
 t=1;        % Column 1 time vector
 thr=2;      % Column 2 throttle vector
@@ -156,54 +159,100 @@ for n = 1 : nFiles
     end
 end
 
-%% Filter acceleration and gyro data
+
+
+%% Data filtering and smothing
 data.filtered = struct;
 f = Test_Filter();
 for n = 1 : nFiles
     for m = 1 : mFiles
         if ~(isfield(data.filtered, dataName{n,m}))
-            for i = 1 : 6
+            for i = 1 : nColumns
                switch i
-                   case 1
-                       temp = filter(f, data.ing.(dataName{n,m})(:,ax));
+                   case t
+                       % Coppy time vector
+                       data.filtered.(dataName{n,m}) = ...
+                            data.ing.(dataName{n,m})(:,t);
+                   case thr
+                       % no change to throttle data
+                       data.filtered.(dataName{n,m}) = ...
+                            [data.filtered.(dataName{n,m}),...
+                             data.ing.(dataName{n,m})(:,thr)];
+                   case ste
+                       % No change to steering data
+                       data.filtered.(dataName{n,m}) = ...
+                            [data.filtered.(dataName{n,m}),...
+                             data.ing.(dataName{n,m})(:,ste)];
+                   case nFL
+                       % Smooth wheel speed data to eliminate spikes
+                       data.filtered.(dataName{n,m}) = ...
+                           [data.filtered.(dataName{n,m}),...
+                            smooth(data.ing.(dataName{n,m})(:,nFL),...
+                            0.004,'rloess')];
+                   case nFR
+                       data.filtered.(dataName{n,m}) = ...
+                           [data.filtered.(dataName{n,m}),...
+                            smooth(data.ing.(dataName{n,m})(:,nFR),...
+                            0.004,'rloess')];
+                   case ax
                        data.filtered.(dataName{n,m}) =...
-                                    [data.ing.(dataName{n,m})(:,t), temp];
-                       clear temp;
-                   case 2
-                       temp = filter(f, data.ing.(dataName{n,m})(:,ay));
+                           [data.filtered.(dataName{n,m}),...
+                           smooth(data.ing.(dataName{n,m})(:,ax),...
+                           0.0021,'rloess')];                       
+                   case ay
                        data.filtered.(dataName{n,m}) =...
-                                    [data.filtered.(dataName{n,m}), temp];
-                       clear temp;
-                   case 3
-                       temp = filter(f, data.ing.(dataName{n,m})(:,az));
+                           [data.filtered.(dataName{n,m}),...
+                           smooth(data.ing.(dataName{n,m})(:,ay),...
+                           0.0021,'rloess')];
+                   case az
                        data.filtered.(dataName{n,m}) =...
-                                    [data.filtered.(dataName{n,m}), temp];
-                       clear temp;
-                   case 4
-                       temp = filter(f, data.ing.(dataName{n,m})(:,gx));
+                           [data.filtered.(dataName{n,m}),...
+                           smooth(data.ing.(dataName{n,m})(:,az),...
+                           0.0021,'rloess')];
+                   case gx
                        data.filtered.(dataName{n,m}) =...
-                                    [data.filtered.(dataName{n,m}), temp];
-                       clear temp; 
-                   case 5
-                       temp = filter(f, data.ing.(dataName{n,m})(:,gy));
+                           [data.filtered.(dataName{n,m}),...
+                           smooth(data.ing.(dataName{n,m})(:,gx),...
+                           0.0021,'rloess')]; 
+                   case gy
                        data.filtered.(dataName{n,m}) =...
-                                    [data.filtered.(dataName{n,m}), temp];
-                       clear temp;
-                   case 6
-                       temp = filter(f, data.ing.(dataName{n,m})(:,gz));
+                           [data.filtered.(dataName{n,m}),...
+                           smooth(data.ing.(dataName{n,m})(:,gy),...
+                           0.0021,'rloess')];
+                   case gz
                        data.filtered.(dataName{n,m}) =...
-                                    [data.filtered.(dataName{n,m}), temp];
-                       clear temp;
+                           [data.filtered.(dataName{n,m}),...
+                           smooth(data.ing.(dataName{n,m})(:,gz),...
+                           0.0021,'rloess')];
                end
             end
         end
     end
 end
 
+%% PCA Analysis on the data
+data.pca = struct;
+for n = 1 : nFiles
+    for m = 1 : mFiles
+        if ~(isfield(data.pca, dataName{n,m}))
+            % Coppy time vector
+            data.pca.(dataName{n,m}) = data.ing.(dataName{n,m})(:,t);
+            % Feature Scaling and mean normalization
+            for i = 2 : nColumns
+                temp =...
+                        (data.ing.(dataName{n,m})(:,i) -...
+                        mean(data.ing.(dataName{n,m})(:,i))) /...
+                        std(data.ing.(dataName{n,m})(:,i));
+                data.pca.(dataName{n,m}) = [data.pca.(dataName{n,m}), ...
+                                            temp];
+                clear temp;
+            end        
+        end
+    end
+end
+
 %% Calculate Power Spectral Density for acceleration and gyro data
 data.psd = struct;
-
-
 for n = 1 : nFiles
     for m = 1 : mFiles
         if ~(isfield(data.psd, dataName{n,m}))
@@ -269,10 +318,23 @@ for n = 1 : nFiles
                      data.ing.(dataName{n,m})(:,thr))
                 plot(data.ing.(dataName{n,m})(:,t),...
                      data.ing.(dataName{n,m})(:,ste))
+                
+                 if(filteredOverlay == true) 
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                         data.filtered.(dataName{n,m})(:,thr))
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                         data.filtered.(dataName{n,m})(:,ste))
+                    legend('Throttle',...
+                           'Steering',...
+                           'Filtered Throttle',...
+                           'Filtered Steering')
+                 else
+                     legend('Throttle', 'Steering')
+                 end
+                
                 title('Steering and Throttle')
                 xlabel('Time (s)')
                 ylabel('(-)')
-                legend('Throttle', 'Steering')
                 grid minor
                 ylim([-1.5 1.5])
                 hold off
@@ -328,6 +390,7 @@ for n = 1 : nFiles
         end
     end
 end
+
 %% Plot filtered data
 for n = 1 : nFiles
     for m = 1 : mFiles
