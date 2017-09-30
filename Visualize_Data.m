@@ -161,7 +161,7 @@ end
 
 
 
-%% Data filtering and smothing
+%% Data smothing
 data.filtered = struct;
 f = Test_Filter();
 for n = 1 : nFiles
@@ -252,43 +252,46 @@ for n = 1 : nFiles
 end
 
 %% Calculate Power Spectral Density for acceleration and gyro data
+% Data is filtered with a filter specifyed by psdFilter.m
 data.psd = struct;
+fHp = psdFilter;
+
 for n = 1 : nFiles
     for m = 1 : mFiles
         if ~(isfield(data.psd, dataName{n,m}))
             for i = 1 : 6
                 switch i
                     case 1
-                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,ax),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,ax)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) = [f, p];
                         clear p f;
                     case 2
-                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,ay),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,ay)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 3
-                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,az),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,az)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 4
-                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,gx),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,gx)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 5
-                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,gy),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,gy)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 6
-                        [p,f] = pwelch(data.ing.(dataName{n,m})(:,gz),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,gz)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
@@ -345,10 +348,23 @@ for n = 1 : nFiles
                      data.ing.(dataName{n,m})(:,nFL))
                 plot(data.ing.(dataName{n,m})(:,t),...
                      data.ing.(dataName{n,m})(:,nFR))
+                
+                if(filteredOverlay == true)
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                         data.filtered.(dataName{n,m})(:,nFL))
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                         data.filtered.(dataName{n,m})(:,nFR))
+                     legend('Front left',...
+                            'Front right',...
+                            'Front left Filtered',...
+                            'Front right Filtered')
+                    
+                else
+                    legend('Front left','Front right')
+                end
                 title('Wheel Speed')
                 xlabel('Time (s)')
                 ylabel('(1/min)')
-                legend('Front left','Front right')
                 grid minor
                 ylim([0 3000])
                 hold off
@@ -361,10 +377,24 @@ for n = 1 : nFiles
                      data.ing.(dataName{n,m})(:,ay))
                 plot(data.ing.(dataName{n,m})(:,t),...
                      data.ing.(dataName{n,m})(:,az))
+                
+                if(filteredOverlay == true)
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                     data.filtered.(dataName{n,m})(:,ax))
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                     data.filtered.(dataName{n,m})(:,ay))
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                     data.filtered.(dataName{n,m})(:,az))
+                    legend('x-Axis','y-Axis','z-Axis',...
+                           'x-Axis Filtered',...
+                           'y-Axis Filtered',...
+                           'z-Axis Filtered')
+                else
+                    legend('x-Axis','y-Axis','z-Axis')
+                end
                 title('Acceleration')
                 xlabel('Time (s)')
                 ylabel('(g)')
-                legend('x-Axis','y-Axis','z-Axis')
                 grid minor
                 ylim([-(cal.acc.range+0.5), cal.acc.range+0.5])
                 hold off
@@ -377,10 +407,26 @@ for n = 1 : nFiles
                      data.ing.(dataName{n,m})(:,gy))
                 plot(data.ing.(dataName{n,m})(:,t),...
                      data.ing.(dataName{n,m})(:,gz))
+                 
+                if(filteredOverlay == true)
+                    plot(data.filtered.(dataName{n,m})(:,t),...
+                         data.filtered.(dataName{n,m})(:,gx))
+                plot(data.filtered.(dataName{n,m})(:,t),...
+                     data.filtered.(dataName{n,m})(:,gy))
+                plot(data.filtered.(dataName{n,m})(:,t),...
+                     data.filtered.(dataName{n,m})(:,gz))
+                
+                legend('x-Axis','y-Axis','z-Axis',...
+                       'x-Axis Filtered',...
+                       'y-Axis Filtered',...
+                       'z-Axis Filtered')
+                else
+                    legend('x-Axis','y-Axis','z-Axis')
+                end
+                
                 title('Gyroscope')
                 xlabel('Time (s)')
                 ylabel('(°/s)')
-                legend('x-Axis','y-Axis','z-Axis')
                 grid minor
                 ylim([-(cal.gyro.range+50), cal.gyro.range+50])
                 hold off
@@ -391,106 +437,106 @@ for n = 1 : nFiles
     end
 end
 
-%% Plot filtered data
-for n = 1 : nFiles
-    for m = 1 : mFiles
-        if (data.ploted.(dataName{n,m}) ~= 2)
-           figure('units','normalized','outerposition',[0 0 1 1])
-                   annotation('textbox', [0 0.9 1 0.1], ...
-                  'String',...
-                   strcat({''},dataName{n,m},{' -Check filtered Data'}),...
-                  'EdgeColor', 'none', ...
-                  'HorizontalAlignment', 'center',...
-                  'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-            
-            subplot(6,1,1)
-                hold on
-                plot(data.filtered.(dataName{n,m})(:,1),...
-                     data.filtered.(dataName{n,m})(:,2))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,ax))
-                
-                title('Acceleration x-Axis')
-                xlabel('Time (s)')
-                ylabel('(g)')
-                legend('filtered','orginal')
-                ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
-                hold off
-                
-            subplot(6,1,2)
-                hold on
-                plot(data.filtered.(dataName{n,m})(:,1),...
-                     data.filtered.(dataName{n,m})(:,3))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,ay))
-                
-                title('Acceleration y-Axis')
-                xlabel('Time (s)')
-                ylabel('(g)')
-                legend('filtered','orginal')
-                ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
-                hold off
-                            
-            subplot(6,1,3)
-                hold on
-                plot(data.filtered.(dataName{n,m})(:,1),...
-                     data.filtered.(dataName{n,m})(:,4))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,az))
-                
-                title('Acceleration z-Axis')
-                xlabel('Time (s)')
-                ylabel('(g)')
-                legend('filtered','orginal')
-                ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
-                hold off
-            
-           subplot(6,1,4)
-                hold on
-                plot(data.filtered.(dataName{n,m})(:,1),...
-                     data.filtered.(dataName{n,m})(:,5))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,gx))
-                
-                title('Gyroscope x-Axis')
-                xlabel('Time (s)')
-                ylabel('(°/s)')
-                legend('filtered','orginal')
-                ylim([-(cal.gyro.range+50) cal.gyro.range+50])
-                hold off
-            
-           subplot(6,1,5)
-                hold on
-                plot(data.filtered.(dataName{n,m})(:,1),...
-                     data.filtered.(dataName{n,m})(:,6))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,gy))
-                
-                title('Gyroscope y-Axis')
-                xlabel('Time (s)')
-                ylabel('(°/s)')
-                legend('filtered','orginal')
-                ylim([-(cal.gyro.range+50) cal.gyro.range+50])
-                hold off
-                 
-          subplot(6,1,6)
-                hold on
-                plot(data.filtered.(dataName{n,m})(:,1),...
-                     data.filtered.(dataName{n,m})(:,7))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,gz))
-                
-                title('Gyroscope z-Axis')
-                xlabel('Time (s)')
-                ylabel('(°/s)')
-                legend('filtered','orginal')
-                ylim([-(cal.gyro.range+50) cal.gyro.range+50])
-                hold off
-                
-            data.ploted.(dataName{n,m}) = 2;
-        end
-    end
-end
+% %% Plot filtered data
+% for n = 1 : nFiles
+%     for m = 1 : mFiles
+%         if (data.ploted.(dataName{n,m}) ~= 2)
+%            figure('units','normalized','outerposition',[0 0 1 1])
+%                    annotation('textbox', [0 0.9 1 0.1], ...
+%                   'String',...
+%                    strcat({''},dataName{n,m},{' -Check filtered Data'}),...
+%                   'EdgeColor', 'none', ...
+%                   'HorizontalAlignment', 'center',...
+%                   'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+%             
+%             subplot(6,1,1)
+%                 hold on
+%                 plot(data.filtered.(dataName{n,m})(:,1),...
+%                      data.filtered.(dataName{n,m})(:,2))
+%                 plot(data.ing.(dataName{n,m})(:,t),...
+%                      data.ing.(dataName{n,m})(:,ax))
+%                 
+%                 title('Acceleration x-Axis')
+%                 xlabel('Time (s)')
+%                 ylabel('(g)')
+%                 legend('filtered','orginal')
+%                 ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
+%                 hold off
+%                 
+%             subplot(6,1,2)
+%                 hold on
+%                 plot(data.filtered.(dataName{n,m})(:,1),...
+%                      data.filtered.(dataName{n,m})(:,3))
+%                 plot(data.ing.(dataName{n,m})(:,t),...
+%                      data.ing.(dataName{n,m})(:,ay))
+%                 
+%                 title('Acceleration y-Axis')
+%                 xlabel('Time (s)')
+%                 ylabel('(g)')
+%                 legend('filtered','orginal')
+%                 ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
+%                 hold off
+%                             
+%             subplot(6,1,3)
+%                 hold on
+%                 plot(data.filtered.(dataName{n,m})(:,1),...
+%                      data.filtered.(dataName{n,m})(:,4))
+%                 plot(data.ing.(dataName{n,m})(:,t),...
+%                      data.ing.(dataName{n,m})(:,az))
+%                 
+%                 title('Acceleration z-Axis')
+%                 xlabel('Time (s)')
+%                 ylabel('(g)')
+%                 legend('filtered','orginal')
+%                 ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
+%                 hold off
+%             
+%            subplot(6,1,4)
+%                 hold on
+%                 plot(data.filtered.(dataName{n,m})(:,1),...
+%                      data.filtered.(dataName{n,m})(:,5))
+%                 plot(data.ing.(dataName{n,m})(:,t),...
+%                      data.ing.(dataName{n,m})(:,gx))
+%                 
+%                 title('Gyroscope x-Axis')
+%                 xlabel('Time (s)')
+%                 ylabel('(°/s)')
+%                 legend('filtered','orginal')
+%                 ylim([-(cal.gyro.range+50) cal.gyro.range+50])
+%                 hold off
+%             
+%            subplot(6,1,5)
+%                 hold on
+%                 plot(data.filtered.(dataName{n,m})(:,1),...
+%                      data.filtered.(dataName{n,m})(:,6))
+%                 plot(data.ing.(dataName{n,m})(:,t),...
+%                      data.ing.(dataName{n,m})(:,gy))
+%                 
+%                 title('Gyroscope y-Axis')
+%                 xlabel('Time (s)')
+%                 ylabel('(°/s)')
+%                 legend('filtered','orginal')
+%                 ylim([-(cal.gyro.range+50) cal.gyro.range+50])
+%                 hold off
+%                  
+%           subplot(6,1,6)
+%                 hold on
+%                 plot(data.filtered.(dataName{n,m})(:,1),...
+%                      data.filtered.(dataName{n,m})(:,7))
+%                 plot(data.ing.(dataName{n,m})(:,t),...
+%                      data.ing.(dataName{n,m})(:,gz))
+%                 
+%                 title('Gyroscope z-Axis')
+%                 xlabel('Time (s)')
+%                 ylabel('(°/s)')
+%                 legend('filtered','orginal')
+%                 ylim([-(cal.gyro.range+50) cal.gyro.range+50])
+%                 hold off
+%                 
+%             data.ploted.(dataName{n,m}) = 2;
+%         end
+%     end
+% end
 
 %% Plot g-force data scatter 
 for n = 1 : nFiles
