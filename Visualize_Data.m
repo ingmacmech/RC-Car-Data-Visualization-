@@ -1,5 +1,5 @@
 %% TODO:
-% -- Optimize Filter
+% -- Replace all isfield ifs with flagMatrix (better solution)
 
 %% Clear all resources
 clear;
@@ -27,7 +27,9 @@ dataName = {'Test1_0g_HV_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test1_0g_HV_0grad_3
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
 nColumns = 11;              % The number of columns in the data file + 1
-
+flagMatrix = false(nFiles,mFiles); % Specifies wich data set is to ignore 
+                                   % not to plot or process same data sets 
+                                   % multipel times
 %% Plot Controlls
 filteredOverlay = true;
 
@@ -59,7 +61,7 @@ for n = 1 : nFiles
     end
 end
 
-%% Add a time vector to the raw data and init ploted flag 
+%% Add a time vector to the raw data and init flagMatrix 
 for n = 1 : nFiles
     for m = 1 : mFiles
         if ~(size(data.raw.(dataName{n,m}),2) >= nColumns) 
@@ -69,7 +71,8 @@ for n = 1 : nFiles
                1/cal.settings.samplingFreq)';
 
             data.raw.(dataName{n,m}) = [time , data.raw.(dataName{n,m})];
-            data.ploted.(dataName{n,m}) = 0;
+            flagMatrix(n,m) = true;
+            data.ploted.(dataName{n,m}) = 0; %TODO: replace with flagMatrix
             clear time;
         end
     end
@@ -231,22 +234,27 @@ for n = 1 : nFiles
 end
 
 %% PCA Analysis on the data
-data.pca = struct;
+data.pca.set = struct;
+data.pca.label = struct;
+firstEnteringFlag = true;
+
 for n = 1 : nFiles
     for m = 1 : mFiles
-        if ~(isfield(data.pca, dataName{n,m}))
-            % Coppy time vector
-            data.pca.(dataName{n,m}) = data.ing.(dataName{n,m})(:,t);
-            % Feature Scaling and mean normalization
-            for i = 2 : nColumns
-                temp =...
-                        (data.ing.(dataName{n,m})(:,i) -...
-                        mean(data.ing.(dataName{n,m})(:,i))) /...
-                        std(data.ing.(dataName{n,m})(:,i));
-                data.pca.(dataName{n,m}) = [data.pca.(dataName{n,m}), ...
-                                            temp];
-                clear temp;
-            end        
+        if (flagMatrix(n,m) == true)
+            % Put different datasets togeter
+            if(firstEnteringFlag == true)
+                data.pca.set = data.ing.(dataName{n,m})(:,2:end);
+                firstEnteringFlag = false;
+            else
+                data.pca.set = [data.pca.set;...
+                                data.ing.(dataName{n,m})(:,2:end)];
+            end
+            
+            
+         
+            
+            
+            
         end
     end
 end
