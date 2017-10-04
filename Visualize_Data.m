@@ -23,7 +23,10 @@ dataName = {'Test1_0g_HV_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test1_0g_HV_0grad_3
             'Test1_0g_HV_0grad_1' , 'Test2_900gH_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test2_900gH_0grad_2';
             'Test1_0g_HV_0grad_3' , 'Test2_900gH_0grad_3' , 'Test1_0g_HV_0grad_4' , 'Test2_900gH_0grad_4'
              };
-           
+loadMatrix = [      0             ,          0            ,             0         ,           0;
+                    1             ,          1            ,             1         ,           1; 
+                    0             ,          1            ,             0         ,           1;
+                    0             ,          1            ,             0         ,           1];           
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
 nColumns = 11;              % The number of columns in the data file + 1
@@ -107,6 +110,8 @@ for n = 1 : nFiles
                    % Convert wheel speed front left data from int to 1/min
                         temp = (cal.wheel.n ./...
                                 data.raw.(dataName{n,m})(:,nFL));
+                        % replace inf with zero
+                        temp(~isfinite(temp))=0;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
@@ -114,8 +119,11 @@ for n = 1 : nFiles
                    % Convert wheel speed front right data from int to 1/min     
                         temp = (cal.wheel.n ./...
                                 data.raw.(dataName{n,m})(:,nFR));
+                        % replace inf with zero
+                        temp(~isfinite(temp))=0;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
+                        
                         clear temp;
                     case 6
                         % Convert acceleration data x-axis from int to g
@@ -236,6 +244,9 @@ end
 %% PCA Analysis on the data
 data.pca.set = struct;
 data.pca.label = struct;
+data.pca.coef = struct;
+data.pca.scores = struct;
+data.pca.pcvars = struct;
 firstEnteringFlag = true;
 
 for n = 1 : nFiles
@@ -244,21 +255,35 @@ for n = 1 : nFiles
             % Put different datasets togeter
             if(firstEnteringFlag == true)
                 data.pca.set = data.ing.(dataName{n,m})(:,2:end);
+                if(loadMatrix(n,m) == 1)
+                    data.pca.label =...
+                                  ones(size(data.ing.(dataName{n,m}),1),1);
+                else
+                    data.pca.label =...
+                                  zeros(size(data.ing.(dataName{n,m}),1),1);
+                end
                 firstEnteringFlag = false;
             else
                 data.pca.set = [data.pca.set;...
                                 data.ing.(dataName{n,m})(:,2:end)];
+                if(loadMatrix(n,m) == 1)
+                    data.pca.label =...
+                             [data.pca.label;...
+                             ones(size(data.ing.(dataName{n,m}),1),1)];
+                else
+                    data.pca.label =...
+                             [data.pca.label;...
+                             zeros(size(data.ing.(dataName{n,m}),1),1)];
+                end
             end
-            
-            
-         
-            
-            
-            
         end
     end
 end
 
+[data.pca.coef,data.pca.scores,data.pca.pcvars] =...
+                                    pca(data.pca.set);
+
+clear firstEnteringFlag;
 %% Calculate Power Spectral Density for acceleration and gyro data
 % Data is filtered with a filter specifyed by psdFilter.m
 data.psd = struct;
@@ -872,3 +897,107 @@ for n = 1 : nFiles
         legend(dataName(n,:),'interpreter','none')
         hold off
 end
+
+%% Plot PCA Analysis
+figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            ' Welch Power Spectral Density Estimation',...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+        
+
+
+hold on
+scatter(data.pca.scores(data.pca.label==0,1),...
+        data.pca.scores(data.pca.label==0,2),'b')
+scatter(data.pca.scores(data.pca.label==1,1),...
+        data.pca.scores(data.pca.label==1,2),'r')
+    grid minor
+hold off
+
+xlabel(["PCA1 (",...
+        num2str(round(data.pca.pcvars(1)/sum(data.pca.pcvars)*100)),'%)'])
+ylabel(["PCA2 (",...
+        num2str(round(data.pca.pcvars(2)/sum(data.pca.pcvars)*100)),'%)'])
+title('PCA Analysis reduced to 2D')
+
+    
+figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            ' Welch Power Spectral Density Estimation',...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+
+hold on
+scatter3(data.pca.scores(data.pca.label==0,1),...
+         data.pca.scores(data.pca.label==0,2),...
+         data.pca.scores(data.pca.label==0,3),'b')
+     
+scatter3(data.pca.scores(data.pca.label==1,1),...
+         data.pca.scores(data.pca.label==1,2),...
+         data.pca.scores(data.pca.label==1,3),'r')
+     grid minor
+     
+hold off
+
+xlabel(["PCA1 (",...
+        num2str(round(data.pca.pcvars(1)/sum(data.pca.pcvars)*100)),'%)'])
+ylabel(["PCA2 (",...
+        num2str(round(data.pca.pcvars(2)/sum(data.pca.pcvars)*100)),'%)'])
+zlabel(["PCA3 (",...
+        num2str(round(data.pca.pcvars(3)/sum(data.pca.pcvars)*100)),'%)'])
+title('PCA Analysis reduced to 3D (PCA1/PCA2/PCA3)')
+
+
+figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            ' Welch Power Spectral Density Estimation',...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+        
+
+
+hold on
+scatter(data.pca.scores(data.pca.label==0,2),...
+        data.pca.scores(data.pca.label==0,3),'b')
+scatter(data.pca.scores(data.pca.label==1,2),...
+        data.pca.scores(data.pca.label==1,3),'r')
+    grid minor
+hold off
+
+xlabel(["PCA2 (",...
+        num2str(round(data.pca.pcvars(2)/sum(data.pca.pcvars)*100)),'%)'])
+ylabel(["PCA3 (",...
+        num2str(round(data.pca.pcvars(3)/sum(data.pca.pcvars)*100)),'%)'])
+title('PCA Analysis reduced to 2D (PCA2/PCA3)')
+
+
+figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            ' Welch Power Spectral Density Estimation',...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+        
+
+
+hold on
+scatter(data.pca.scores(data.pca.label==0,4),...
+        data.pca.scores(data.pca.label==0,5),'b')
+scatter(data.pca.scores(data.pca.label==1,4),...
+        data.pca.scores(data.pca.label==1,5),'r')
+    grid minor
+hold off
+
+xlabel(["PCA4 (",...
+        num2str(round(data.pca.pcvars(2)/sum(data.pca.pcvars)*100)),'%)'])
+ylabel(["PCA5 (",...
+        num2str(round(data.pca.pcvars(3)/sum(data.pca.pcvars)*100)),'%)'])
+title('PCA Analysis reduced to 2D (PCA4/PCA5)')
