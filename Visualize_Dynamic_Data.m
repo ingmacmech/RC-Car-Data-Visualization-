@@ -18,22 +18,16 @@ load('cal');
 %% List of data to open and data ending
 dataType = {'.txt'};
 
-% dataName = {'Test1_0g_HV_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test1_0g_HV_0grad_3' , 'Test1_0g_HV_0grad_4';
-%             'Test2_900gH_0grad_1' , 'Test2_900gH_0grad_2' , 'Test2_900gH_0grad_3' , 'Test2_900gH_0grad_4';
-%             'Test1_0g_HV_0grad_1' , 'Test2_900gH_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test2_900gH_0grad_2';
-%             'Test1_0g_HV_0grad_3' , 'Test2_900gH_0grad_3' , 'Test1_0g_HV_0grad_4' , 'Test2_900gH_0grad_4'
-%             };
+dataName = {'Test1_0g_HV_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test1_0g_HV_0grad_3' , 'Test1_0g_HV_0grad_4';
+            'Test2_900gH_0grad_1' , 'Test2_900gH_0grad_2' , 'Test2_900gH_0grad_3' , 'Test2_900gH_0grad_4';
+            'Test1_0g_HV_0grad_1' , 'Test2_900gH_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test2_900gH_0grad_2';
+            'Test1_0g_HV_0grad_3' , 'Test2_900gH_0grad_3' , 'Test1_0g_HV_0grad_4' , 'Test2_900gH_0grad_4'
+            };
 
-% loadMatrix = [      0             ,          0            ,             0         ,           0;
-%                     1             ,          1            ,             1         ,           1; 
-%                     0             ,          1            ,             0         ,           1;
-%                     0             ,          1            ,             0         ,           1]; 
-
-dataName = {'Test9_0g_H_Statisch_1';
-            'Test10_900g_H_Statisch_1';
-            'Test11_0g_900g_Statisch_1'};
-        
-loadMatrix = [0;0;0];
+loadMatrix = [      0             ,          0            ,             0         ,           0;
+                    1             ,          1            ,             1         ,           1; 
+                    0             ,          1            ,             0         ,           1;
+                    0             ,          1            ,             0         ,           1]; 
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
