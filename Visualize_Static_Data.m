@@ -17,17 +17,30 @@ load('cal');
 %% List of data to open and data ending
 dataType = {'.txt'};
 
-dataName = {'Test9_0g_H_Statisch_1';
-            'Test10_900g_H_Statisch_1';
-            'Test11_0g_900g_Statisch_1'};
+dataName = {'Test12_0g_Statisch_1';
+            'Test13_200g_Statisch_1';
+            'Test14_400g_Statisch_1';
+            'Test15_600g_Statisch_1';
+            'Test16_900g_Statisch_1'};
+
+dataInfo = {'';
+            'Loaded';
+            'Loaded 200g';
+            'Loaded 400g';
+            'Loaded 600g';
+            'Loaded 900g'};
         
+targetPitchAngle = [0 0.8 1.7 2.5 3.4];
+
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
 nColumns = 11;              % The number of columns in the data file + 1
 flagMatrix = false(nFiles,mFiles); % Specifies wich data set is to ignore 
                                    % not to plot or process same data sets 
                                    % multipel times
-                                   
+%% Set data set with wich the offset is corrected
+nOffset = 1;
+mOffset = 1;
 %% Columns
 column.t=1;        % Column 1 time vector
 column.thr=2;      % Column 2 throttle vector
@@ -172,25 +185,107 @@ for n = 1 : nFiles
         if (flagMatrix(n,m) == true)
             data.pitch.(dataName{n,m}) =...
                                    atan(data.ing.(dataName{n,m})(:,6))./...
-                                        data.ing.(dataName{n,m})(:,8);
+                                        data.ing.(dataName{n,m})(:,8)*180/pi;
             data.pitch.std.(dataName{n,m}) =...
                                            std(data.pitch.(dataName{n,m}));
             data.pitch.mean.(dataName{n,m}) =...
                                           mean(data.pitch.(dataName{n,m}));
-%             if (firstEnteryFlag == true)
-%                 data.pitch.name = {dataName{n,m} [data]}; 
-%             else
-%                 data.pitch.name = {data.pitch.name;dataName{n,m}};
-%             end
         end
     end
 end
 
 
-%% Plot 
-figure()
+%% Plot Time Data
+for n = 1 : nFiles
+    
+    figure('units','normalized','outerposition',[0 0 1 1])
+    
+    annotation('textbox', [0 0.9 1 0.1], ...
+               'String',...
+               strcat({''},dataName{n,m},{' - Static tests'}),...
+               'EdgeColor', 'none', ...
+               'HorizontalAlignment', 'center',...
+               'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+    
+    subplot(3,1,1)
+    hold on
+    for m = 1 : mFiles
+        plot(data.ing.(dataName{n,m})(:,column.t),...
+             data.ing.(dataName{n,m})(:,column.ax))
+    end
+    hold off
+    title('Acceleration x-Axis')
+    ylabel('(g)')
+    xlabel('Time (s)')
+    grid minor
+    
+    subplot(3,1,2)
+    hold on
+    for m = 1 : mFiles
+        plot(data.ing.(dataName{n,m})(:,column.t),...
+             data.ing.(dataName{n,m})(:,column.az))
+    end
+    hold off
+    title('Acceleration z-Axis')
+    ylabel('(g)')
+    xlabel('Time (s)')
+    grid minor
+    
+    subplot(3,1,3)
+    hold on
+    for m = 1 : mFiles
+        plot(data.ing.(dataName{n,m})(:,column.t),...
+             data.ing.(dataName{n,m})(:,column.gy))
+    end
+    hold off
+    title('Gyroscope y-Axis')
+    ylabel('(g)')
+    xlabel('Time (s)')
+    grid minor
+    
+end
+
+%% Plot estimation of pitch angle without correction
+figure('units','normalized','outerposition',[0 0 1 1])
+    
+    annotation('textbox', [0 0.9 1 0.1], ...
+               'String',...
+               'Estimation for pitch angle without correction',...
+               'EdgeColor', 'none', ...
+               'HorizontalAlignment', 'center',...
+               'FontSize',12, 'FontWeight', 'bold','interpreter','none')
 hold on
+for n = 1 : nFiles
+    errorbar(n,data.pitch.mean.(dataName{n,m}),...
+               data.pitch.std.(dataName{n,m}),'ob')
+    plot(n,targetPitchAngle(n),'+r')
+end
+hold off
 
-errorbar()
+xticks([0:nFiles+1])
+set(gca,'XtickLabel',dataInfo)
+xlim([0 nFiles+1])
+grid minor
 
-figure()
+%% Plot estimation of pitch angle with offset correction
+figure('units','normalized','outerposition',[0 0 1 1])
+    
+    annotation('textbox', [0 0.9 1 0.1], ...
+               'String',...
+               'Estimation for pitch angle without correction',...
+               'EdgeColor', 'none', ...
+               'HorizontalAlignment', 'center',...
+               'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+hold on
+for n = 1 : nFiles
+    errorbar(n,data.pitch.mean.(dataName{n,m})-...
+               data.pitch.mean.(dataName{nOffset,mOffset}),...
+               data.pitch.std.(dataName{n,m}),'ob')
+    plot(n,targetPitchAngle(n),'+r','MarkerSize',20)
+end
+hold off
+
+xticks([0:nFiles+1])
+set(gca,'XtickLabel',dataInfo)
+xlim([0 nFiles+1])
+grid minor
