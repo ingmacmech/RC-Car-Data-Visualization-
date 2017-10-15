@@ -31,6 +31,7 @@ dataInfo = {'';
             'Loaded 900g'};
         
 targetPitchAngle = [0 0.8 1.7 2.5 3.4];
+loadValue = [0 200 400 600 900]; 
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
@@ -77,7 +78,6 @@ for n = 1 : nFiles
 
             data.raw.(dataName{n,m}) = [time , data.raw.(dataName{n,m})];
             flagMatrix(n,m) = true;
-            data.ploted.(dataName{n,m}) = 0; %TODO: replace with flagMatrix
             clear time;
         end
     end
@@ -194,6 +194,9 @@ for n = 1 : nFiles
     end
 end
 
+%% Fit a linear model for angle and loading
+
+linearModel = fitlm(loadValue,targetPitchAngle,'linear','Intercept',false);
 
 %% Plot Time Data
 for n = 1 : nFiles
@@ -245,6 +248,19 @@ for n = 1 : nFiles
     
 end
 
+%% Plot linear Modell
+figure('units','normalized','outerposition',[0 0 1 1])
+
+annotation('textbox', [0 0.9 1 0.1], ...
+               'String',...
+               'Linear Model for load and angle',...
+               'EdgeColor', 'none', ...
+               'HorizontalAlignment', 'center',...
+               'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+
+hold on
+plot(loadValue,targetPitchAngle,'')
+
 %% Plot estimation of pitch angle without correction
 figure('units','normalized','outerposition',[0 0 1 1])
     
@@ -256,9 +272,23 @@ figure('units','normalized','outerposition',[0 0 1 1])
                'FontSize',12, 'FontWeight', 'bold','interpreter','none')
 hold on
 for n = 1 : nFiles
-    errorbar(n,data.pitch.mean.(dataName{n,m}),...
-               data.pitch.std.(dataName{n,m}),'ob')
-    plot(n,targetPitchAngle(n),'+r')
+    if(n == 1)
+         errorbar(n,data.pitch.mean.(dataName{n,m}),...
+               data.pitch.std.(dataName{n,m}),...
+               'ob',...
+               'HandleVisibility','on')
+    plot(n,targetPitchAngle(n),...
+           '*r',...
+           'HandleVisibility','on')
+    else
+        errorbar(n,data.pitch.mean.(dataName{n,m}),...
+                   data.pitch.std.(dataName{n,m}),...
+                   'ob',...
+                   'HandleVisibility','off')
+        plot(n,targetPitchAngle(n),...
+               '*r',...
+               'HandleVisibility','off')
+    end
 end
 hold off
 
@@ -266,7 +296,9 @@ xticks([0:nFiles+1])
 set(gca,'XtickLabel',dataInfo)
 xlim([0 nFiles+1])
 grid minor
-
+xlabel('Load Condition')
+ylabel('Pitch angle (°)')
+legend('Calculated','Target Value')
 %% Plot estimation of pitch angle with offset correction
 figure('units','normalized','outerposition',[0 0 1 1])
     
@@ -278,10 +310,23 @@ figure('units','normalized','outerposition',[0 0 1 1])
                'FontSize',12, 'FontWeight', 'bold','interpreter','none')
 hold on
 for n = 1 : nFiles
-    errorbar(n,data.pitch.mean.(dataName{n,m})-...
+    if n == 1
+       errorbar(n,data.pitch.mean.(dataName{n,m})-...
                data.pitch.mean.(dataName{nOffset,mOffset}),...
-               data.pitch.std.(dataName{n,m}),'ob')
-    plot(n,targetPitchAngle(n),'+r','MarkerSize',20)
+               data.pitch.std.(dataName{n,m}),...
+               'ob',...
+               'HandleVisibility','on')
+    plot(n,targetPitchAngle(n),'*r',...
+         'HandleVisibility','on') 
+    else
+        errorbar(n,data.pitch.mean.(dataName{n,m})-...
+                   data.pitch.mean.(dataName{nOffset,mOffset}),...
+                   data.pitch.std.(dataName{n,m}),...
+                   'ob',...
+                   'HandleVisibility','off')
+        plot(n,targetPitchAngle(n),'*r',...
+             'HandleVisibility','off')
+    end
 end
 hold off
 
@@ -289,3 +334,6 @@ xticks([0:nFiles+1])
 set(gca,'XtickLabel',dataInfo)
 xlim([0 nFiles+1])
 grid minor
+xlabel('Load Condition')
+ylabel('Pitch angle (°)')
+legend('Calculated','Target Value')
