@@ -9,9 +9,9 @@ dataName = {'Test1_0g_HV_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test1_0g_HV_0grad_3
             };
         
 loadMatrix = [      0             ,          0            ,             0         ,           0;
-                    1             ,          1            ,             1         ,           1; 
-                    0             ,          1            ,             0         ,           1;
-                    0             ,          1            ,             0         ,           1];
+                    900           ,          900          ,             900       ,           900; 
+                    0             ,          900          ,             0         ,           900;
+                    0             ,          900          ,             0         ,           900];
 
 save('dataSet_1.mat','dataName','loadMatrix');
 clear dataName loadMatrix
@@ -26,8 +26,8 @@ dataName = {'Test17_0g_Steigung1_Dyn_1' , 'Test17_0g_Steigung1_Dyn_2' , 'Test17_
         
 loadMatrix = [      0             ,          0            ,             0 ;
                     0             ,          0            ,             0 ; 
-                    1             ,          1            ,             1 ;
-                    1             ,          1            ,             1 ];
+                    900           ,          900          ,             900 ;
+                    900           ,          900          ,             900 ];
                 
 save('dataSet_2.mat','dataName','loadMatrix');
 clear dataName loadMatrix

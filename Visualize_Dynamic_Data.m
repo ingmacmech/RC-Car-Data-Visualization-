@@ -19,7 +19,7 @@ load('cal');
 dataType = {'.txt'};
 
 % dataSet_1: Includes only data with slope = 0 and weight 0g and 900g
-load('dataSet_2.mat');
+load('dataSet_1.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
@@ -33,17 +33,21 @@ angleOffset = 1.6; % Offset correktion for pitch angle see Visualize_Static_Data
 orginalOverlay = false;
 
 %% Columns
-t=1;        % Column 1 time vector
-thr=2;      % Column 2 throttle vector
-ste=3;      % Column 3 steering vector
-nFL=4;      % Column 4 wheel speed front left
-nFR=5;      % Column 5 wheel speed front right
-ax=6;       % Column 6 acceleration x-Axis
-ay=7;       % Column 7 acceleration y-Axis
-az=8;       % Column 8 acceleration z-Axis
-gx=9;       % Column 9 gyroscope x-Axis
-gy=10;      % Column 10 gyroscope y-Axis
-gz=11;      % Column 11 gyroscope z-Axis
+c.t=1;        % Column 1 time vector
+c.thr=2;      % Column 2 throttle vector
+c.ste=3;      % Column 3 steering vector
+c.nFL=4;      % Column 4 wheel speed front left
+c.nFR=5;      % Column 5 wheel speed front right
+c.ax=6;       % Column 6 acceleration x-Axis
+c.ay=7;       % Column 7 acceleration y-Axis
+c.az=8;       % Column 8 acceleration z-Axis
+c.gx=9;       % Column 9 gyroscope x-Axis
+c.gy=10;      % Column 10 gyroscope y-Axis
+c.gz=11;      % Column 11 gyroscope z-Axis
+c.dFR=12;     % Column 12 Axle height front right
+c.dFL=13;     % Column 13 Axle height front left
+c.dHR=14;     % Column 14 Axle height back right
+c.dHL=15;     % Column 15 Axle height front left
 
 %% Marker styles 
 markerType = {'o','+','*','.','x','s','d','^','v','>','<','p','h'};
@@ -87,25 +91,25 @@ for n = 1 : nFiles
                     case 1
                         % Copy time vektor
                         data.ing.(dataName{n,m}) =...
-                                            data.raw.(dataName{n,m})(:,t);
+                                            data.raw.(dataName{n,m})(:,c.t);
                     case 2
                         % Convert throttle data
                         temp = polyval(cal.throttle.polyVal,...
-                                       data.raw.(dataName{n,m})(:,thr));
+                                       data.raw.(dataName{n,m})(:,c.thr));
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 3
                         % Convert steering data
                         temp = polyval(cal.steering.polyVal,...
-                                       data.raw.(dataName{n,m})(:,ste));
+                                       data.raw.(dataName{n,m})(:,c.ste));
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 4
                    % Convert wheel speed front left data from int to 1/min
                         temp = (cal.wheel.n ./...
-                                data.raw.(dataName{n,m})(:,nFL));
+                                data.raw.(dataName{n,m})(:,c.nFL));
                         % replace inf with zero
                         temp(~isfinite(temp))=0;
                         data.ing.(dataName{n,m}) =...
@@ -114,7 +118,7 @@ for n = 1 : nFiles
                     case 5
                    % Convert wheel speed front right data from int to 1/min     
                         temp = (cal.wheel.n ./...
-                                data.raw.(dataName{n,m})(:,nFR));
+                                data.raw.(dataName{n,m})(:,c.nFR));
                         % replace inf with zero
                         temp(~isfinite(temp))=0;
                         data.ing.(dataName{n,m}) =...
@@ -123,39 +127,39 @@ for n = 1 : nFiles
                         clear temp;
                     case 6
                         % Convert acceleration data x-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,ax)*cal.acc.mult;
+                        temp = data.raw.(dataName{n,m})(:,c.ax)*cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 7
                         % Convert acceleration data y-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,ay)*cal.acc.mult;
+                        temp = data.raw.(dataName{n,m})(:,c.ay)*cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 8
                         % Convert acceleration data z-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,az)*cal.acc.mult;
+                        temp = data.raw.(dataName{n,m})(:,c.az)*cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 9
                         % Convert gyroscope data x-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,gx) *...
+                        temp = data.raw.(dataName{n,m})(:,c.gx) *...
                                                              cal.gyro.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 10
                         % Convert gyroscope data y-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,gy) *...
+                        temp = data.raw.(dataName{n,m})(:,c.gy) *...
                                                              cal.gyro.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case 11
                         % Convert gyroscope data z-axis from int to g
-                        temp = data.raw.(dataName{n,m})(:,gz) *...
+                        temp = data.raw.(dataName{n,m})(:,c.gz) *...
                                                              cal.gyro.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
@@ -176,62 +180,62 @@ for n = 1 : nFiles
         if ~(isfield(data.filtered, dataName{n,m}))
             for i = 1 : nColumns
                switch i
-                   case t
+                   case c.t
                        % Coppy time vector
                        data.filtered.(dataName{n,m}) = ...
-                            data.ing.(dataName{n,m})(:,t);
-                   case thr
+                            data.ing.(dataName{n,m})(:,c.t);
+                   case c.thr
                        % no change to throttle data
                        data.filtered.(dataName{n,m}) = ...
                             [data.filtered.(dataName{n,m}),...
-                             smooth(data.ing.(dataName{n,m})(:,thr),...
+                             smooth(data.ing.(dataName{n,m})(:,c.thr),...
                              0.003,'rloess')];
-                   case ste
+                   case c.ste
                        % No change to steering data
                        data.filtered.(dataName{n,m}) = ...
                             [data.filtered.(dataName{n,m}),...
-                             smooth(data.ing.(dataName{n,m})(:,ste),...
+                             smooth(data.ing.(dataName{n,m})(:,c.ste),...
                              0.003,'rloess')];
-                   case nFL
+                   case c.nFL
                        % Smooth wheel speed data to eliminate spikes
                        data.filtered.(dataName{n,m}) = ...
                            [data.filtered.(dataName{n,m}),...
-                            smooth(data.ing.(dataName{n,m})(:,nFL),...
+                            smooth(data.ing.(dataName{n,m})(:,c.nFL),...
                             0.003,'rloess')];
-                   case nFR
+                   case c.nFR
                        data.filtered.(dataName{n,m}) = ...
                            [data.filtered.(dataName{n,m}),...
-                            smooth(data.ing.(dataName{n,m})(:,nFR),...
+                            smooth(data.ing.(dataName{n,m})(:,c.nFR),...
                             0.003,'rloess')];
-                   case ax
+                   case c.ax
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                           smooth(data.ing.(dataName{n,m})(:,ax),...
+                           smooth(data.ing.(dataName{n,m})(:,c.ax),...
                            0.0021,'rloess')];                       
-                   case ay
+                   case c.ay
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                           smooth(data.ing.(dataName{n,m})(:,ay),...
+                           smooth(data.ing.(dataName{n,m})(:,c.ay),...
                            0.0021,'rloess')];
-                   case az
+                   case c.az
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                           smooth(data.ing.(dataName{n,m})(:,az),...
+                           smooth(data.ing.(dataName{n,m})(:,c.az),...
                            0.0021,'rloess')];
-                   case gx
+                   case c.gx
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                           smooth(data.ing.(dataName{n,m})(:,gx),...
+                           smooth(data.ing.(dataName{n,m})(:,c.gx),...
                            0.0021,'rloess')]; 
-                   case gy
+                   case c.gy
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                           smooth(data.ing.(dataName{n,m})(:,gy),...
+                           smooth(data.ing.(dataName{n,m})(:,c.gy),...
                            0.0021,'rloess')];
-                   case gz
+                   case c.gz
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                           smooth(data.ing.(dataName{n,m})(:,gz),...
+                           smooth(data.ing.(dataName{n,m})(:,c.gz),...
                            0.0021,'rloess')];
                end
             end
@@ -253,21 +257,23 @@ for n = 1 : nFiles
             % Put different datasets togeter
             if(firstEnteringFlag == true)
                 data.pca.set = data.ing.(dataName{n,m})(:,2:end);
-                if(loadMatrix(n,m) == 1)
+                if(loadMatrix(n,m) > 0)
                     data.pca.label =...
-                                  ones(size(data.ing.(dataName{n,m}),1),1);
+                    ones(size(data.ing.(dataName{n,m}),1),1) *...
+                    loadMatrix(n,m);
                 else
                     data.pca.label =...
                                   zeros(size(data.ing.(dataName{n,m}),1),1);
                 end
-                firstEnteringFlag = false;
+                    firstEnteringFlag = false;
             else
                 data.pca.set = [data.pca.set;...
                                 data.ing.(dataName{n,m})(:,2:end)];
-                if(loadMatrix(n,m) == 1)
+                if(loadMatrix(n,m) > 0)
                     data.pca.label =...
                              [data.pca.label;...
-                             ones(size(data.ing.(dataName{n,m}),1),1)];
+                             ones(size(data.ing.(dataName{n,m}),1),1)*...
+                             loadMatrix(n,m)];
                 else
                     data.pca.label =...
                              [data.pca.label;...
@@ -284,6 +290,12 @@ end
 %save('pcaAnalysis.mat','-struct','data','pca');
 
 clear firstEnteringFlag;
+
+%% Prepare data for Neuronal Networks
+% data has alredy been put together in PCA
+nn_input = data.pca.set;
+nn_output = data.pca.label;
+%save('nn_data.mat','nn_input','nn_output')
 
 %% Calculating rms value for Data
 data.rms = struct;
@@ -326,36 +338,36 @@ for n = 1 : nFiles
             for i = 1 : 6
                 switch i
                     case 1
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,ax)),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.ax)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) = [f, p];
                         clear p f;
                     case 2
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,ay)),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.ay)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 3
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,az)),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.az)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 4
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,gx)),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.gx)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 5
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,gy)),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.gy)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 6
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,gz)),...
+                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.gz)),...
                                        [],[],[],cal.settings.samplingFreq);
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
@@ -381,16 +393,16 @@ for n = 1 : nFiles
 
             subplot(4,1,1)
                 hold on
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,thr))
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,ste))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.thr))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.ste))
                 
                  if(orginalOverlay == true)     
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                         data.ing.(dataName{n,m})(:,thr))
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                         data.ing.(dataName{n,m})(:,ste))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                         data.ing.(dataName{n,m})(:,c.thr))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                         data.ing.(dataName{n,m})(:,c.ste))
                     legend('Smoothed Throttle',...
                             'Smoothed Steering',...
                             'Throttle',...
@@ -409,16 +421,16 @@ for n = 1 : nFiles
 
             subplot(4,1,2)
                 hold on
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,nFL))
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,nFR))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.nFL))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.nFR))
                 
                 if(orginalOverlay == true)       
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                         data.ing.(dataName{n,m})(:,nFL))
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                         data.ing.(dataName{n,m})(:,nFR))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                         data.ing.(dataName{n,m})(:,c.nFL))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                         data.ing.(dataName{n,m})(:,c.nFR))
                     legend('Smoothed Front left',...
                            'Smoothed Front right',...
                            'Orginal Front left',...
@@ -437,20 +449,20 @@ for n = 1 : nFiles
 
              subplot(4,1,3)
                 hold on
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,ax))
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,ay))
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,az))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.ax))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.ay))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.az))
                 
                 if(orginalOverlay == true)
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                         data.ing.(dataName{n,m})(:,ax))
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                         data.ing.(dataName{n,m})(:,ay))
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                         data.ing.(dataName{n,m})(:,az))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                         data.ing.(dataName{n,m})(:,c.ax))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                         data.ing.(dataName{n,m})(:,c.ay))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                         data.ing.(dataName{n,m})(:,c.az))
                      legend('Smoothed x-Axis',...
                             'Smoothed y-Axis',...
                             'Smoothed z-Axis',...
@@ -469,21 +481,21 @@ for n = 1 : nFiles
 
              subplot(4,1,4)
                 hold on
-                   plot(data.filtered.(dataName{n,m})(:,t),...
-                         data.filtered.(dataName{n,m})(:,gx))
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,gy))
-                plot(data.filtered.(dataName{n,m})(:,t),...
-                     data.filtered.(dataName{n,m})(:,gz))
+                   plot(data.filtered.(dataName{n,m})(:,c.t),...
+                         data.filtered.(dataName{n,m})(:,c.gx))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.gy))
+                plot(data.filtered.(dataName{n,m})(:,c.t),...
+                     data.filtered.(dataName{n,m})(:,c.gz))
                 
                  
                 if(orginalOverlay == true)
-                    plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,gx))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,gy))
-                plot(data.ing.(dataName{n,m})(:,t),...
-                     data.ing.(dataName{n,m})(:,gz))
+                    plot(data.ing.(dataName{n,m})(:,c.t),...
+                     data.ing.(dataName{n,m})(:,c.gx))
+                plot(data.ing.(dataName{n,m})(:,c.t),...
+                     data.ing.(dataName{n,m})(:,c.gy))
+                plot(data.ing.(dataName{n,m})(:,c.t),...
+                     data.ing.(dataName{n,m})(:,c.gz))
                  legend('Smoothed x-Axis',...
                         'Smoothed y-Axis',...
                         'Smoothed z-Axis',...
@@ -526,8 +538,8 @@ end
 %                 hold on
 %                 plot(data.filtered.(dataName{n,m})(:,1),...
 %                      data.filtered.(dataName{n,m})(:,2))
-%                 plot(data.ing.(dataName{n,m})(:,t),...
-%                      data.ing.(dataName{n,m})(:,ax))
+%                 plot(data.ing.(dataName{n,m})(:,c.t),...
+%                      data.ing.(dataName{n,m})(:,c.ax))
 %                 
 %                 title('Acceleration x-Axis')
 %                 xlabel('Time (s)')
@@ -540,8 +552,8 @@ end
 %                 hold on
 %                 plot(data.filtered.(dataName{n,m})(:,1),...
 %                      data.filtered.(dataName{n,m})(:,3))
-%                 plot(data.ing.(dataName{n,m})(:,t),...
-%                      data.ing.(dataName{n,m})(:,ay))
+%                 plot(data.ing.(dataName{n,m})(:,c.t),...
+%                      data.ing.(dataName{n,m})(:,c.ay))
 %                 
 %                 title('Acceleration y-Axis')
 %                 xlabel('Time (s)')
@@ -554,8 +566,8 @@ end
 %                 hold on
 %                 plot(data.filtered.(dataName{n,m})(:,1),...
 %                      data.filtered.(dataName{n,m})(:,4))
-%                 plot(data.ing.(dataName{n,m})(:,t),...
-%                      data.ing.(dataName{n,m})(:,az))
+%                 plot(data.ing.(dataName{n,m})(:,c.t),...
+%                      data.ing.(dataName{n,m})(:,c.az))
 %                 
 %                 title('Acceleration z-Axis')
 %                 xlabel('Time (s)')
@@ -568,8 +580,8 @@ end
 %                 hold on
 %                 plot(data.filtered.(dataName{n,m})(:,1),...
 %                      data.filtered.(dataName{n,m})(:,5))
-%                 plot(data.ing.(dataName{n,m})(:,t),...
-%                      data.ing.(dataName{n,m})(:,gx))
+%                 plot(data.ing.(dataName{n,m})(:,c.t),...
+%                      data.ing.(dataName{n,m})(:,c.gx))
 %                 
 %                 title('Gyroscope x-Axis')
 %                 xlabel('Time (s)')
@@ -582,8 +594,8 @@ end
 %                 hold on
 %                 plot(data.filtered.(dataName{n,m})(:,1),...
 %                      data.filtered.(dataName{n,m})(:,6))
-%                 plot(data.ing.(dataName{n,m})(:,t),...
-%                      data.ing.(dataName{n,m})(:,gy))
+%                 plot(data.ing.(dataName{n,m})(:,c.t),...
+%                      data.ing.(dataName{n,m})(:,c.gy))
 %                 
 %                 title('Gyroscope y-Axis')
 %                 xlabel('Time (s)')
@@ -596,7 +608,7 @@ end
 %                 hold on
 %                 plot(data.filtered.(dataName{n,m})(:,1),...
 %                      data.filtered.(dataName{n,m})(:,7))
-%                 plot(data.ing.(dataName{n,m})(:,t),...
+%                 plot(data.ing.(dataName{n,m})(:,c.t),...
 %                      data.ing.(dataName{n,m})(:,gz))
 %                 
 %                 title('Gyroscope z-Axis')
@@ -622,9 +634,9 @@ for n = 1 : nFiles
             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
     hold on
         for m = 1 : mFiles
-            scatter(data.ing.(dataName{n,m})(:,ay),...
-                    data.ing.(dataName{n,m})(:,ax),20,...
-                    data.ing.(dataName{n,m})(:,az),markerType{m});
+            scatter(data.ing.(dataName{n,m})(:,c.ay),...
+                    data.ing.(dataName{n,m})(:,c.ax),20,...
+                    data.ing.(dataName{n,m})(:,c.az),markerType{m});
         end
         xlabel('y-Axis (g)')
         ylabel('x-Axis (g)')
@@ -665,13 +677,13 @@ for n = 1 : nFiles
            hold on
            title('x-Axis acceleration and throttle')
            yyaxis left
-           plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,ax));
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ax));
            ylabel('(g)')
            ylim([-2 2])
            grid minor
            
            yyaxis right
-           plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,thr));
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
            ylabel('-')
            xlabel('Time (s)')
            ylim([-1.5 1.5])
@@ -682,13 +694,13 @@ for n = 1 : nFiles
            hold on
            title('y-Axis acceleration and steering')
            yyaxis left
-           plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,ay));
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ay));
            ylabel('(g)')
            ylim([-2 2])
            grid minor
            
            yyaxis right
-           plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,ste));
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ste));
            ylabel('(-)')
            xlabel('Time (s)')
            ylim([-1.5 1.5])
@@ -699,13 +711,13 @@ for n = 1 : nFiles
            hold on
            title('z-Axis acceleration and throttle')
            yyaxis left
-           plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,az));
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.az));
            ylabel('(g)')
            ylim([-2 2])
            grid minor
            
            yyaxis right
-           plot(data.ing.(dataName{n})(:,t),data.ing.(dataName{n})(:,thr));
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
            ylabel('(-)')
            xlabel('Time (s)')
            ylim([-1.5 1.5])
@@ -726,8 +738,8 @@ for n = 1 : nFiles
     subplot(2,3,1)
         hold on
         for m = 1 : mFiles
-            plot(data.ing.(dataName{n,m})(:,thr),...
-                 data.ing.(dataName{n,m})(:,ax),markerType{m});
+            plot(data.ing.(dataName{n,m})(:,c.thr),...
+                 data.ing.(dataName{n,m})(:,c.ax),markerType{m});
         end
         axis([-1.5 1.5 -(cal.acc.range+0.5) cal.acc.range+0.5])
         xlabel('Throttle (-)')
@@ -739,8 +751,8 @@ for n = 1 : nFiles
     subplot(2,3,2)
         hold on
         for m = 1 : mFiles
-            plot(data.ing.(dataName{n,m})(:,thr),...
-                 data.ing.(dataName{n,m})(:,ay),markerType{m});
+            plot(data.ing.(dataName{n,m})(:,c.thr),...
+                 data.ing.(dataName{n,m})(:,c.ay),markerType{m});
         end
         axis([-1.5 1.5 -(cal.acc.range+0.5) cal.acc.range+0.5])
         xlabel('Throttle (-)')
@@ -753,8 +765,8 @@ for n = 1 : nFiles
     subplot(2,3,3)
         hold on
         for m = 1 : mFiles
-            plot(data.ing.(dataName{n,m})(:,thr),...
-                 data.ing.(dataName{n,m})(:,az),markerType{m});
+            plot(data.ing.(dataName{n,m})(:,c.thr),...
+                 data.ing.(dataName{n,m})(:,c.az),markerType{m});
         end
         axis([-1.5 1.5 -(cal.acc.range+0.5) cal.acc.range+0.5])
         xlabel('Throttle (-)')
@@ -766,8 +778,8 @@ for n = 1 : nFiles
     subplot(2,3,4)
         hold on
         for m = 1 : mFiles
-            plot(data.ing.(dataName{n,m})(:,ste),...
-                 data.ing.(dataName{n,m})(:,ax),markerType{m});
+            plot(data.ing.(dataName{n,m})(:,c.ste),...
+                 data.ing.(dataName{n,m})(:,c.ax),markerType{m});
         end
         axis([-1.5 1.5 -(cal.acc.range+0.5) cal.acc.range+0.5])
         xlabel('Steering (-)')
@@ -779,8 +791,8 @@ for n = 1 : nFiles
     subplot(2,3,5)
         hold on
         for m = 1 : mFiles
-            plot(data.ing.(dataName{n,m})(:,ste),...
-                 data.ing.(dataName{n,m})(:,ay),markerType{m});
+            plot(data.ing.(dataName{n,m})(:,c.ste),...
+                 data.ing.(dataName{n,m})(:,c.ay),markerType{m});
         end
         
         axis([-1.5 1.5 -(cal.acc.range+0.5) cal.acc.range+0.5])
@@ -793,8 +805,8 @@ for n = 1 : nFiles
     subplot(2,3,6)
         hold on
         for m = 1 : mFiles
-            plot(data.ing.(dataName{n,m})(:,ste),...
-                 data.ing.(dataName{n,m})(:,az),markerType{m});
+            plot(data.ing.(dataName{n,m})(:,c.ste),...
+                 data.ing.(dataName{n,m})(:,c.az),markerType{m});
         end
          axis([-1.5 1.5 -(cal.acc.range+0.5) cal.acc.range+0.5])
         xlabel('Steering (-)')
@@ -818,7 +830,7 @@ for n = 1 : nFiles
      subplot(3,1,1)
         hold on
         for m = 1 : mFiles
-            h1 = histogram(data.ing.(dataName{n,m})(:,ax));
+            h1 = histogram(data.ing.(dataName{n,m})(:,c.ax));
             h1.Normalization = 'probability';
             h1.BinWidth = 0.1;
         end
@@ -831,7 +843,7 @@ for n = 1 : nFiles
      subplot(3,1,2)
         hold on
         for m = 1 : mFiles
-            h1 = histogram(data.ing.(dataName{n,m})(:,ay));
+            h1 = histogram(data.ing.(dataName{n,m})(:,c.ay));
             h1.Normalization = 'probability';
             h1.BinWidth = 0.1;
         end      
@@ -844,7 +856,7 @@ for n = 1 : nFiles
      subplot(3,1,3)
         hold on
         for m = 1 : mFiles
-            h1 = histogram(data.ing.(dataName{n,m})(:,az));
+            h1 = histogram(data.ing.(dataName{n,m})(:,c.az));
             h1.Normalization = 'probability';
             h1.BinWidth = 0.1;
         end      

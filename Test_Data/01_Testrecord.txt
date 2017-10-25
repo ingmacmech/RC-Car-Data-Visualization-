@@ -1,0 +1,11 @@
+Messprotokoll
+
+
+Name				Samplerate	Acc Sensytivity		Gyro Sensitivity	Ort		Beschreibung
+
+Fallversuch_25cm_1.txt		???		-+16g			+-2 °/s			Burgdorf	Fahrzeug wurde aus 25cm höhe fallengelassen
+Fallversuch_25cm_2.txt		???		-+16g			+-2 °/s			Burgdorf	Wiederholung
+Fallversuch_50cm_3.txt		???		-+16g			+-2 °/s			Burgdorf	Fahrzeug wurde aus 50cm höhe fallengelassen
+Fallversuch_50cm_3.txt		???		-+16g			+-2 °/s			Burgdorf	Wiederholung
+
+Test1_0_X_0_D_L_1.txt 		40 Hz		+-2g			+-250°/s		Biel		Test1_0g_HV_0grad_1
