@@ -11,11 +11,18 @@ cal.gyro.range = 500;         % Possible values 250, 500, 1000, 2000
 
 
 %% Load Calibration file and separate vectors 
-calData = load('CalData.txt');
-t = (0 : 1/cal.settings.samplingFreq :(length(calData(:,1))-1) *...
+calDataControll = load('CalData_Stearing_Throttle.txt');
+calDataPoti = load('CalData_Poti.txt');
+t_controll = (0 : 1/cal.settings.samplingFreq :(length(calDataControll(:,1))-1) *...
                                   1/cal.settings.samplingFreq)';
-throttle = calData(:,1);
-steering = calData(:,2);
+t_poti = (0 : 1/cal.settings.samplingFreq :(length(calDataPoti(:,1))-1) *...
+                                  1/cal.settings.samplingFreq)';
+throttle = calDataControll(:,1);
+steering = calDataControll(:,2);
+potiHL = calDataPoti(:,11);
+potiHR = calDataPoti(:,12);
+potiFR = calDataPoti(:,13);
+potiFL = calDataPoti(:,14);
 
 %% Set Acceleration and Gyro conversion factor
 
@@ -80,18 +87,18 @@ cal.steering.polyVal = [aSteering bSteering];
 figure('units','normalized','outerposition',[0 0 1 1])
 subplot(1,2,1)
 hold on
-plot(t,calData(:,1))
-plot([t(1) t(end)],[cal.throttle.maxPos cal.throttle.maxPos], '--r')
+plot(t_controll,calDataControll(:,1))
+plot([t_controll(1) t_controll(end)],[cal.throttle.maxPos cal.throttle.maxPos], '--r')
 text(1,cal.throttle.maxPos+70,['maxPosTrottle = ',...
                             num2str(cal.throttle.maxPos)],...
                            'HorizontalAlignment','left');
                             
-plot([t(1) t(end)],[cal.throttle.minPos cal.throttle.minPos], '--r')
+plot([t_controll(1) t_controll(end)],[cal.throttle.minPos cal.throttle.minPos], '--r')
 text(1,cal.throttle.minPos+70,['minPosTrottle = ',...
                             num2str(cal.throttle.minPos)],...
                            'HorizontalAlignment','left');
                             
-plot([t(1) t(end)],[cal.throttle.nullPos cal.throttle.nullPos], '--b')
+plot([t_controll(1) t_controll(end)],[cal.throttle.nullPos cal.throttle.nullPos], '--b')
 text(1,cal.throttle.nullPos+70,['nullPosTrottle = ',...
                              num2str(cal.throttle.nullPos)],...
                             'HorizontalAlignment','left');
@@ -120,19 +127,19 @@ hold off
 figure('units','normalized','outerposition',[0 0 1 1])
 subplot(1,2,1)
 hold on
-plot(t,calData(:,2))
+plot(t_controll,calDataControll(:,2))
 
-plot([t(1) t(end)],[cal.steering.maxPos cal.steering.maxPos], '--r')
+plot([t_controll(1) t_controll(end)],[cal.steering.maxPos cal.steering.maxPos], '--r')
 text(1,cal.steering.maxPos+70,['maxPosSteering = ',...
                             num2str(cal.steering.maxPos)],...
                            'HorizontalAlignment','left');
                             
-plot([t(1) t(end)],[cal.steering.minPos cal.steering.minPos], '--r')
+plot([t_controll(1) t_controll(end)],[cal.steering.minPos cal.steering.minPos], '--r')
 text(1,cal.steering.minPos+70,['minPosSteering = ',...
                             num2str(cal.steering.minPos)],...
                            'HorizontalAlignment','left');
                             
-plot([t(1) t(end)],[cal.steering.nullPos cal.steering.nullPos], '--b')
+plot([t_controll(1) t_controll(end)],[cal.steering.nullPos cal.steering.nullPos], '--b')
 text(1,cal.steering.nullPos+70,['nullPosTrottle = ',...
                              num2str(cal.steering.nullPos)],...
                             'HorizontalAlignment','left');
@@ -156,6 +163,44 @@ xlim([2500 6500])
 ylim([-1.2 1.2])
 grid minor
 ylabel('left turn \leftarrow 0 \rightarrow right turn')
+hold off
+
+%% Potentiometer calibratiotion
+
+% Conversion value from ADC value to degrees
+cal.angleGain = 340/4095; % 340° electrical travel see datatsheet and 4095 max ADC Value
+cal.rearLeaver = 27;
+cal.frontLeaver = 25;
+
+
+% Caluculating the offset
+cal.offsetPotiHR = mean(potiHR);
+cal.offsetPotiHL = mean(potiHL);
+cal.offsetPotiFR = mean(potiFR);
+cal.offsetPotiFL = mean(potiFL);
+
+% Calculating ADC values to degrees and subtract mean
+travelHR = (sin(((potiHR - cal.offsetPotiHR) * cal.angleGain)*pi/180)) * cal.rearLeaver;
+travelHL = (sin(((potiHL - cal.offsetPotiHL) * cal.angleGain)*pi/180)) * cal.rearLeaver;
+travelFR = (sin(((potiFR - cal.offsetPotiFR) * cal.angleGain)*pi/180)) * cal.frontLeaver;
+travelFL = (sin(((potiFL - cal.offsetPotiFL) * cal.angleGain)*pi/180)) * cal.frontLeaver;
+
+figure('units','normalized','outerposition',[0 0 1 1])
+
+subplot(2,1,1)
+hold on
+plot(t_poti,potiHR);
+plot(t_poti,potiHL);
+plot(t_poti,potiFR);
+plot(t_poti,potiFL);
+hold off
+
+subplot(2,1,2)
+hold on
+plot(t_poti,travelHR);
+plot(t_poti,travelHL);
+plot(t_poti,travelFR);
+plot(t_poti,travelFL);
 hold off
 
 

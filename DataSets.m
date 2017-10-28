@@ -1,5 +1,15 @@
 %% Set different data sets
+clc;
+clear;
+close all
+% Test data file
 
+dataName = {'LOG9'};
+
+loadMatrix = [1];
+
+save('Poti_Test.mat','dataName','loadMatrix');
+clear dataName loadMatrix
 
 % First data set recorded
 dataName = {'Test1_0g_HV_0grad_1' , 'Test1_0g_HV_0grad_2' , 'Test1_0g_HV_0grad_3' , 'Test1_0g_HV_0grad_4';

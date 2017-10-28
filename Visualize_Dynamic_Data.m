@@ -19,11 +19,11 @@ load('cal');
 dataType = {'.txt'};
 
 % dataSet_1: Includes only data with slope = 0 and weight 0g and 900g
-load('dataSet_1.mat');
+load('Poti_Test.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
-nColumns = 11;              % The number of columns in the data file + 1
+nColumns = 15;              % The number of columns in the data file + 1
 flagMatrix = false(nFiles,mFiles); % Specifies wich data set is to ignore 
                                    % not to plot or process same data sets 
                                    % multipel times
@@ -44,10 +44,10 @@ c.az=8;       % Column 8 acceleration z-Axis
 c.gx=9;       % Column 9 gyroscope x-Axis
 c.gy=10;      % Column 10 gyroscope y-Axis
 c.gz=11;      % Column 11 gyroscope z-Axis
-c.dFR=12;     % Column 12 Axle height front right
-c.dFL=13;     % Column 13 Axle height front left
-c.dHR=14;     % Column 14 Axle height back right
-c.dHL=15;     % Column 15 Axle height front left
+c.dHL=12;     % Column 12 Axle height front right
+c.dHR=13;     % Column 13 Axle height front left
+c.dFR=14;     % Column 14 Axle height back right
+c.dFL=15;     % Column 15 Axle height front left
 
 %% Marker styles 
 markerType = {'o','+','*','.','x','s','d','^','v','>','<','p','h'};
@@ -157,10 +157,45 @@ for n = 1 : nFiles
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 11
+                    case c.gz
                         % Convert gyroscope data z-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,c.gz) *...
                                                              cal.gyro.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                    case c.dFL
+                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dFL) -...
+                                     cal.offsetPotiFL) *...
+                                     cal.angleGain)*pi/180)) * cal.frontLeaver; 
+                        
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                        
+                    case c.dFR
+                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dFR) -...
+                                     cal.offsetPotiFR) *...
+                                     cal.angleGain)*pi/180)) * cal.frontLeaver;
+                        
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                        
+                    case c.dHL
+                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dHL) -...
+                                     cal.offsetPotiHL) *...
+                                     cal.angleGain)*pi/180)) * cal.rearLeaver;
+                        
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                        
+                    case c.dHR
+                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dHR) -...
+                                     cal.offsetPotiHR) *...
+                                     cal.angleGain)*pi/180)) * cal.rearLeaver;
+                        
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
