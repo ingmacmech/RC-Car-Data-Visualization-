@@ -8,6 +8,8 @@ cal.settings.f_tim = 18e6;
 cal.acc.range = 2;            % Possible values 2, 4, 8, 16 
 cal.gyro.range = 500;         % Possible values 250, 500, 1000, 2000
  
+%% Veihicle parameters
+cal.lvh = 0.325; % Radstand
 
 
 %% Load Calibration file and separate vectors 

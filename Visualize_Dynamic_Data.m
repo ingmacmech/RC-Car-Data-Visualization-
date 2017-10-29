@@ -6,6 +6,21 @@ clear;
 clc;
 close all;
 
+%% Save Controlls
+savePCA = false;
+namePCA = 'nn_data.mat';
+
+saveNN = false;
+nameNN = 'nn_data.mat';
+
+nColumns = 15;              % The number of columns in the data file + 1
+
+%% Plot Controlls
+orginalOverlay = false;
+
+
+
+
 %% Add path to sub folders
 currentPath = pwd;
 addpath(genpath(currentPath));
@@ -23,14 +38,11 @@ load('Poti_Test.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
-nColumns = 15;              % The number of columns in the data file + 1
 flagMatrix = false(nFiles,mFiles); % Specifies wich data set is to ignore 
                                    % not to plot or process same data sets 
                                    % multipel times
                                    
 angleOffset = 1.6; % Offset correktion for pitch angle see Visualize_Static_Data.m
-%% Plot Controlls
-orginalOverlay = false;
 
 %% Columns
 c.t=1;        % Column 1 time vector
@@ -88,25 +100,25 @@ for n = 1 : nFiles
         if ~(isfield(data.ing, dataName{n,m}))
             for i = 1 : nColumns
                 switch(i)
-                    case 1
+                    case c.t
                         % Copy time vektor
                         data.ing.(dataName{n,m}) =...
                                             data.raw.(dataName{n,m})(:,c.t);
-                    case 2
+                    case c.thr
                         % Convert throttle data
                         temp = polyval(cal.throttle.polyVal,...
                                        data.raw.(dataName{n,m})(:,c.thr));
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 3
+                    case c.ste
                         % Convert steering data
                         temp = polyval(cal.steering.polyVal,...
                                        data.raw.(dataName{n,m})(:,c.ste));
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 4
+                    case c.nFL
                    % Convert wheel speed front left data from int to 1/min
                         temp = (cal.wheel.n ./...
                                 data.raw.(dataName{n,m})(:,c.nFL));
@@ -115,7 +127,7 @@ for n = 1 : nFiles
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 5
+                    case c.nFR
                    % Convert wheel speed front right data from int to 1/min     
                         temp = (cal.wheel.n ./...
                                 data.raw.(dataName{n,m})(:,c.nFR));
@@ -125,32 +137,32 @@ for n = 1 : nFiles
                                           [data.ing.(dataName{n,m}), temp];
                         
                         clear temp;
-                    case 6
+                    case c.ax
                         % Convert acceleration data x-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,c.ax)*cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 7
+                    case c.ay
                         % Convert acceleration data y-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,c.ay)*cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 8
+                    case c.az
                         % Convert acceleration data z-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,c.az)*cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 9
+                    case c.gx
                         % Convert gyroscope data x-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,c.gx) *...
                                                              cal.gyro.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 10
+                    case c.gy
                         % Convert gyroscope data y-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,c.gy) *...
                                                              cal.gyro.mult;
@@ -272,6 +284,26 @@ for n = 1 : nFiles
                            [data.filtered.(dataName{n,m}),...
                            smooth(data.ing.(dataName{n,m})(:,c.gz),...
                            0.0021,'rloess')];
+                   case c.dFL
+                       data.filtered.(dataName{n,m}) =...
+                           [data.filtered.(dataName{n,m}),...
+                            smooth(data.ing.(dataName{n,m})(:,c.dFL),...
+                            0.0021,'rloess')];
+                   case c.dFR
+                       data.filtered.(dataName{n,m}) =...
+                           [data.filtered.(dataName{n,m}),...
+                            smooth(data.ing.(dataName{n,m})(:,c.dFR),...
+                            0.0021,'rloess')];
+                   case c.dHL
+                       data.filtered.(dataName{n,m}) =...
+                           [data.filtered.(dataName{n,m}),...
+                            smooth(data.ing.(dataName{n,m})(:,c.dHL),...
+                            0.0021,'rloess')];
+                   case c.dHR
+                       data.filtered.(dataName{n,m}) =...
+                           [data.filtered.(dataName{n,m}),...
+                            smooth(data.ing.(dataName{n,m})(:,c.dHR),...
+                            0.0021,'rloess')];
                end
             end
         end
@@ -279,6 +311,7 @@ for n = 1 : nFiles
 end
 
 %% PCA Analysis on the data
+% Without poti values
 data.pca.set = struct;
 data.pca.label = struct;
 data.pca.coef = struct;
@@ -291,7 +324,7 @@ for n = 1 : nFiles
         if (flagMatrix(n,m) == true)
             % Put different datasets togeter
             if(firstEnteringFlag == true)
-                data.pca.set = data.ing.(dataName{n,m})(:,2:end);
+                data.pca.set = data.ing.(dataName{n,m})(:,2:11);
                 if(loadMatrix(n,m) > 0)
                     data.pca.label =...
                     ones(size(data.ing.(dataName{n,m}),1),1) *...
@@ -303,7 +336,7 @@ for n = 1 : nFiles
                     firstEnteringFlag = false;
             else
                 data.pca.set = [data.pca.set;...
-                                data.ing.(dataName{n,m})(:,2:end)];
+                                data.ing.(dataName{n,m})(:,2:11)];
                 if(loadMatrix(n,m) > 0)
                     data.pca.label =...
                              [data.pca.label;...
@@ -321,16 +354,19 @@ end
 
 [data.pca.coef,data.pca.scores,data.pca.pcvars] =...
                                     pca(data.pca.set);
-            
-%save('pcaAnalysis.mat','-struct','data','pca');
-
+if(savePCA == true)            
+    save(namePCA,'-struct','data','pca');
+end
 clear firstEnteringFlag;
 
 %% Prepare data for Neuronal Networks
 % data has alredy been put together in PCA
 nn_input = data.pca.set;
 nn_output = data.pca.label;
-%save('nn_data.mat','nn_input','nn_output')
+
+if(saveNN == true)
+    save(nameNN,'nn_input','nn_output')
+end
 
 %% Calculating rms value for Data
 data.rms = struct;
@@ -349,15 +385,28 @@ end
 % TODO: use only data in a certain range
 % TODO: Try to use only the data when velocity is smaler than a threshold
 
-data.pitch = struct;
-
+data.pitch.acc = struct;
+data.pitch.poti.LR = struct; % Pitch angle with FL and HR poti
+data.pitch.poti.RL = struct; % Pitch angle with FR and HL poti
 for n = 1 : nFiles
     for m = 1 : mFiles
         if (flagMatrix(n,m) == true)
-            data.pitch.(dataName{n,m}) =...
-                                atan(data.ing.(dataName{n,m})(:,6))./...
-                                     data.ing.(dataName{n,m})(:,8)...
-                                     *180/pi - angleOffset;
+            data.pitch.acc.(dataName{n,m}) =...
+                atan(data.ing.(dataName{n,m})(:,c.ax)./...
+                     data.ing.(dataName{n,m})(:,c.az))...
+                     *180/pi - angleOffset;
+                 
+            if(nColumns > 11)                     
+                data.pitch.poti.LR.(dataName{n,m}) =...
+                    atan((data.ing.(dataName{n,m})(:,c.dHR) - ...
+                          data.ing.(dataName{n,m})(:,c.dFL))/cal.lvh)*...
+                          180/pi;
+
+                data.pitch.poti.RL.(dataName{n,m}) =...
+                    atan((data.ing.(dataName{n,m})(:,c.dHL) - ...
+                          data.ing.(dataName{n,m})(:,c.dFR))/cal.lvh)*...
+                          180/pi;
+            end
         end
     end
 end
@@ -373,37 +422,49 @@ for n = 1 : nFiles
             for i = 1 : 6
                 switch i
                     case 1
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.ax)),...
-                                       [],[],[],cal.settings.samplingFreq);
+                        [p,f] = pwelch(filter(fHp,...
+                                data.ing.(dataName{n,m})(:,c.ax)),...
+                                [],[],[],cal.settings.samplingFreq);
+                        
                         data.psd.(dataName{n,m}) = [f, p];
                         clear p f;
                     case 2
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.ay)),...
-                                       [],[],[],cal.settings.samplingFreq);
+                        [p,f] = pwelch(filter(fHp,...
+                                data.ing.(dataName{n,m})(:,c.ay)),...
+                                [],[],[],cal.settings.samplingFreq);
+                        
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 3
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.az)),...
-                                       [],[],[],cal.settings.samplingFreq);
+                        [p,f] = pwelch(filter(fHp,...
+                                data.ing.(dataName{n,m})(:,c.az)),...
+                                [],[],[],cal.settings.samplingFreq);
+                            
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 4
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.gx)),...
-                                       [],[],[],cal.settings.samplingFreq);
+                        [p,f] = pwelch(filter(fHp,...
+                                data.ing.(dataName{n,m})(:,c.gx)),...
+                                [],[],[],cal.settings.samplingFreq);
+                            
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 5
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.gy)),...
-                                       [],[],[],cal.settings.samplingFreq);
+                        [p,f] = pwelch(filter(fHp,...
+                                data.ing.(dataName{n,m})(:,c.gy)),...
+                                [],[],[],cal.settings.samplingFreq);
+                            
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
                     case 6
-                        [p,f] = pwelch(filter(fHp,data.ing.(dataName{n,m})(:,c.gz)),...
-                                       [],[],[],cal.settings.samplingFreq);
+                        [p,f] = pwelch(filter(fHp,...
+                                data.ing.(dataName{n,m})(:,c.gz)),...
+                                [],[],[],cal.settings.samplingFreq);
+                            
                         data.psd.(dataName{n,m}) =...
                                              [data.psd.(dataName{n,m}), p];
                         clear p f;
@@ -557,106 +618,6 @@ for n = 1 : nFiles
     end
 end
 
-% %% Plot filtered data
-% for n = 1 : nFiles
-%     for m = 1 : mFiles
-%         if (data.ploted.(dataName{n,m}) ~= 2)
-%            figure('units','normalized','outerposition',[0 0 1 1])
-%                    annotation('textbox', [0 0.9 1 0.1], ...
-%                   'String',...
-%                    strcat({''},dataName{n,m},{' -Check filtered Data'}),...
-%                   'EdgeColor', 'none', ...
-%                   'HorizontalAlignment', 'center',...
-%                   'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-%             
-%             subplot(6,1,1)
-%                 hold on
-%                 plot(data.filtered.(dataName{n,m})(:,1),...
-%                      data.filtered.(dataName{n,m})(:,2))
-%                 plot(data.ing.(dataName{n,m})(:,c.t),...
-%                      data.ing.(dataName{n,m})(:,c.ax))
-%                 
-%                 title('Acceleration x-Axis')
-%                 xlabel('Time (s)')
-%                 ylabel('(g)')
-%                 legend('filtered','orginal')
-%                 ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
-%                 hold off
-%                 
-%             subplot(6,1,2)
-%                 hold on
-%                 plot(data.filtered.(dataName{n,m})(:,1),...
-%                      data.filtered.(dataName{n,m})(:,3))
-%                 plot(data.ing.(dataName{n,m})(:,c.t),...
-%                      data.ing.(dataName{n,m})(:,c.ay))
-%                 
-%                 title('Acceleration y-Axis')
-%                 xlabel('Time (s)')
-%                 ylabel('(g)')
-%                 legend('filtered','orginal')
-%                 ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
-%                 hold off
-%                             
-%             subplot(6,1,3)
-%                 hold on
-%                 plot(data.filtered.(dataName{n,m})(:,1),...
-%                      data.filtered.(dataName{n,m})(:,4))
-%                 plot(data.ing.(dataName{n,m})(:,c.t),...
-%                      data.ing.(dataName{n,m})(:,c.az))
-%                 
-%                 title('Acceleration z-Axis')
-%                 xlabel('Time (s)')
-%                 ylabel('(g)')
-%                 legend('filtered','orginal')
-%                 ylim([-(cal.acc.range+0.5) cal.acc.range+0.5])
-%                 hold off
-%             
-%            subplot(6,1,4)
-%                 hold on
-%                 plot(data.filtered.(dataName{n,m})(:,1),...
-%                      data.filtered.(dataName{n,m})(:,5))
-%                 plot(data.ing.(dataName{n,m})(:,c.t),...
-%                      data.ing.(dataName{n,m})(:,c.gx))
-%                 
-%                 title('Gyroscope x-Axis')
-%                 xlabel('Time (s)')
-%                 ylabel('(°/s)')
-%                 legend('filtered','orginal')
-%                 ylim([-(cal.gyro.range+50) cal.gyro.range+50])
-%                 hold off
-%             
-%            subplot(6,1,5)
-%                 hold on
-%                 plot(data.filtered.(dataName{n,m})(:,1),...
-%                      data.filtered.(dataName{n,m})(:,6))
-%                 plot(data.ing.(dataName{n,m})(:,c.t),...
-%                      data.ing.(dataName{n,m})(:,c.gy))
-%                 
-%                 title('Gyroscope y-Axis')
-%                 xlabel('Time (s)')
-%                 ylabel('(°/s)')
-%                 legend('filtered','orginal')
-%                 ylim([-(cal.gyro.range+50) cal.gyro.range+50])
-%                 hold off
-%                  
-%           subplot(6,1,6)
-%                 hold on
-%                 plot(data.filtered.(dataName{n,m})(:,1),...
-%                      data.filtered.(dataName{n,m})(:,7))
-%                 plot(data.ing.(dataName{n,m})(:,c.t),...
-%                      data.ing.(dataName{n,m})(:,gz))
-%                 
-%                 title('Gyroscope z-Axis')
-%                 xlabel('Time (s)')
-%                 ylabel('(°/s)')
-%                 legend('filtered','orginal')
-%                 ylim([-(cal.gyro.range+50) cal.gyro.range+50])
-%                 hold off
-%                 
-%             data.ploted.(dataName{n,m}) = 2;
-%         end
-%     end
-% end
 
 %% Plot g-force data scatter 
 for n = 1 : nFiles
