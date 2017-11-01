@@ -17,11 +17,11 @@ load('cal');
 %% List of data to open and data ending
 dataType = {'.txt'};
 
-dataName = {'Test12_0g_Statisch_1';
-            'Test13_200g_Statisch_1';
-            'Test14_400g_Statisch_1';
-            'Test15_600g_Statisch_1';
-            'Test16_900g_Statisch_1'};
+dataName = {'Test33_0g_X_Stat_1';
+            'Test34_200g_H_Stat_1';
+            'Test35_400g_H_Stat_1';
+            'Test36_600g_H_Stat_1';
+            'Test37_900g_H_Stat_1'};
 
 dataInfo = {'';
             'Loaded';
@@ -35,7 +35,7 @@ loadValue = [0 200 400 600 900];
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
-nColumns = 11;              % The number of columns in the data file + 1
+nColumns = 15;              % The number of columns in the data file + 1
 flagMatrix = false(nFiles,mFiles); % Specifies wich data set is to ignore 
                                    % not to plot or process same data sets 
                                    % multipel times
@@ -54,6 +54,10 @@ column.az=8;       % Column 8 acceleration z-Axis
 column.gx=9;       % Column 9 gyroscope x-Axis
 column.gy=10;      % Column 10 gyroscope y-Axis
 column.gz=11;      % Column 11 gyroscope z-Axis
+column.dHL=12;     % Column 12 Axle height front right
+column.dHR=13;     % Column 13 Axle height front left
+column.dFR=14;     % Column 14 Axle height back right
+column.dFL=15;     % Column 15 Axle height front left
 
 
 %% Load data
@@ -90,25 +94,25 @@ for n = 1 : nFiles
         if ~(isfield(data.ing, dataName{n,m}))
             for i = 1 : nColumns
                 switch(i)
-                    case 1
+                    case column.t
                         % Copy time vektor
                         data.ing.(dataName{n,m}) =...
                                       data.raw.(dataName{n,m})(:,column.t);
-                    case 2
+                    case column.thr
                         % Convert throttle data
                         temp = polyval(cal.throttle.polyVal,...
                                    data.raw.(dataName{n,m})(:,column.thr));
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 3
+                    case column.ste
                         % Convert steering data
                         temp = polyval(cal.steering.polyVal,...
                                    data.raw.(dataName{n,m})(:,column.ste));
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 4
+                    case column.nFL
                    % Convert wheel speed front left data from int to 1/min
                         temp = (cal.wheel.n ./...
                                 data.raw.(dataName{n,m})(:,column.nFL));
@@ -117,7 +121,7 @@ for n = 1 : nFiles
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 5
+                    case column.nFR
                    % Convert wheel speed front right data from int to 1/min     
                         temp = (cal.wheel.n ./...
                                 data.raw.(dataName{n,m})(:,column.nFR));
@@ -127,45 +131,80 @@ for n = 1 : nFiles
                                           [data.ing.(dataName{n,m}), temp];
                         
                         clear temp;
-                    case 6
+                    case column.ax
                         % Convert acceleration data x-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,column.ax)*...
                                                               cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 7
+                    case column.ay
                         % Convert acceleration data y-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,column.ay)*....
                                                               cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 8
+                    case column.az
                         % Convert acceleration data z-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,column.az)*...
                                                               cal.acc.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 9
+                    case column.gx
                         % Convert gyroscope data x-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,column.gx) *...
                                                              cal.gyro.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 10
+                    case column.gy
                         % Convert gyroscope data y-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,column.gy) *...
                                                              cal.gyro.mult;
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
-                    case 11
+                    case column.gz
                         % Convert gyroscope data z-axis from int to g
                         temp = data.raw.(dataName{n,m})(:,column.gz) *...
                                                              cal.gyro.mult;
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                   case column.dFL
+                        temp = (sin(((data.raw.(dataName{n,m})(:,column.dFL) -...
+                                     cal.offsetPotiFL) *...
+                                     cal.angleGain)*pi/180)) * cal.frontLeaver; 
+                        
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                        
+                    case column.dFR
+                        temp = (sin(((data.raw.(dataName{n,m})(:,column.dFR) -...
+                                     cal.offsetPotiFR) *...
+                                     cal.angleGain)*pi/180)) * cal.frontLeaver;
+                        
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                        
+                    case column.dHL
+                        temp = (sin(((data.raw.(dataName{n,m})(:,column.dHL) -...
+                                     cal.offsetPotiHL) *...
+                                     cal.angleGain)*pi/180)) * cal.rearLeaver;
+                        
+                        data.ing.(dataName{n,m}) =...
+                                          [data.ing.(dataName{n,m}), temp];
+                        clear temp;
+                        
+                    case column.dHR
+                        temp = (sin(((data.raw.(dataName{n,m})(:,column.dHR) -...
+                                     cal.offsetPotiHR) *...
+                                     cal.angleGain)*pi/180)) * cal.rearLeaver;
+                        
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
@@ -176,40 +215,69 @@ for n = 1 : nFiles
 end
 
 %% Calculating pitch angle with data
-data.pitch = struct;
-data.pitch.std = struct;
-data.pitch.mean = struct;
+data.accPitch = struct;
+data.accPitch.std = struct;
+data.accPitch.mean = struct;
+data.potiPitch.LR = struct;
+data.potiPitch.LR.std = struct;
+data.potiPitch.LR.mean = struct;
+data.potiPitch.RL = struct;
+data.potiPitch.RL.std = struct;
+data.potiPitch.RL.mean = struct;
 firstEnteryFlag = true;
 for n = 1 : nFiles
     for m = 1 : mFiles
         if (flagMatrix(n,m) == true)
-            data.pitch.(dataName{n,m}) =...
-                                   atan(data.ing.(dataName{n,m})(:,6))./...
-                                        data.ing.(dataName{n,m})(:,8)*180/pi;
-            data.pitch.std.(dataName{n,m}) =...
-                                           std(data.pitch.(dataName{n,m}));
-            data.pitch.mean.(dataName{n,m}) =...
-                                          mean(data.pitch.(dataName{n,m}));
+            data.accPitch.(dataName{n,m}) =...
+                                   atan(data.ing.(dataName{n,m})(:,column.ax))./...
+                                        data.ing.(dataName{n,m})(:,column.az)*180/pi;
+            
+            data.accPitch.std.(dataName{n,m}) =...
+                                           std(data.accPitch.(dataName{n,m}));
+            data.accPitch.mean.(dataName{n,m}) =...
+                                          mean(data.accPitch.(dataName{n,m}));
+            
+            data.potiPitch.LR.(dataName{n,m}) =...
+                    atan((data.ing.(dataName{n,m})(:,column.dHR) - ...
+                          data.ing.(dataName{n,m})(:,column.dFL))/(cal.lvh*1000))*...
+                          180/pi;
+
+            data.potiPitch.RL.(dataName{n,m}) =...
+                    atan((data.ing.(dataName{n,m})(:,column.dHL) - ...
+                          data.ing.(dataName{n,m})(:,column.dFR))/(cal.lvh*1000))*...
+                          180/pi;
+                      
+            data.potiPitch.LR.std.(dataName{n,m}) =...
+                                std(data.potiPitch.LR.(dataName{n,m}));
+                       
+            data.potiPitch.LR.mean.(dataName{n,m}) = ...
+                                mean(data.potiPitch.LR.(dataName{n,m}));
+                            
+            data.potiPitch.RL.std.(dataName{n,m}) =...
+                                std(data.potiPitch.RL.(dataName{n,m}));
+                       
+            data.potiPitch.RL.mean.(dataName{n,m}) = ...
+                                mean(data.potiPitch.RL.(dataName{n,m}));
         end
     end
+    
 end
 
 %% Fit a linear model for angle and loading
 
 linearModel = fitlm(loadValue,targetPitchAngle,'linear','Intercept',false);
 
-%% Plot Time Data
+%% Plot Time Data acceleration and gyro
 for n = 1 : nFiles
-    
     figure('units','normalized','outerposition',[0 0 1 1])
-    
+
     annotation('textbox', [0 0.9 1 0.1], ...
                'String',...
-               strcat({''},dataName{n,m},{' - Static tests'}),...
+               strcat({''},dataName{n,m},{' - Acceleration and Gyroscope Data'}),...
                'EdgeColor', 'none', ...
                'HorizontalAlignment', 'center',...
                'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-    
+
     subplot(3,1,1)
     hold on
     for m = 1 : mFiles
@@ -221,7 +289,7 @@ for n = 1 : nFiles
     ylabel('(g)')
     xlabel('Time (s)')
     grid minor
-    
+
     subplot(3,1,2)
     hold on
     for m = 1 : mFiles
@@ -233,7 +301,7 @@ for n = 1 : nFiles
     ylabel('(g)')
     xlabel('Time (s)')
     grid minor
-    
+
     subplot(3,1,3)
     hold on
     for m = 1 : mFiles
@@ -244,8 +312,67 @@ for n = 1 : nFiles
     title('Gyroscope y-Axis')
     ylabel('(g)')
     xlabel('Time (s)')
+    grid minor 
+end
+
+%% Plot Time data for poti values
+for n = 1 : nFiles
+    figure('units','normalized','outerposition',[0 0 1 1])
+
+    annotation('textbox', [0 0.9 1 0.1], ...
+               'String',...
+               strcat({''},dataName{n,m},{' - Potentiometer Data'}),...
+               'EdgeColor', 'none', ...
+               'HorizontalAlignment', 'center',...
+               'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+
+    subplot(4,1,1)
+    hold on
+    for m = 1 : mFiles
+        plot(data.ing.(dataName{n,m})(:,column.t),...
+             data.ing.(dataName{n,m})(:,column.dFL))
+    end
+    hold off
+    title('')
+    ylabel('')
+    xlabel('Time (s)')
+    grid minor
+
+    subplot(4,1,2)
+    hold on
+    for m = 1 : mFiles
+        plot(data.ing.(dataName{n,m})(:,column.t),...
+             data.ing.(dataName{n,m})(:,column.dFR))
+    end
+    hold off
+    title('')
+    ylabel('')
+    xlabel('Time (s)')
+    grid minor
+
+    subplot(4,1,3)
+    hold on
+    for m = 1 : mFiles
+        plot(data.ing.(dataName{n,m})(:,column.t),...
+             data.ing.(dataName{n,m})(:,column.dHL))
+    end
+    hold off
+    title('')
+    ylabel('')
+    xlabel('Time (s)')
     grid minor
     
+    subplot(4,1,4)
+    hold on
+    for m = 1 : mFiles
+        plot(data.ing.(dataName{n,m})(:,column.t),...
+             data.ing.(dataName{n,m})(:,column.dHR))
+    end
+    hold off
+    title('')
+    ylabel('')
+    xlabel('Time (s)')
+    grid minor
 end
 
 %% Plot linear Modell
@@ -261,7 +388,7 @@ annotation('textbox', [0 0.9 1 0.1], ...
 hold on
 plot(loadValue,targetPitchAngle,'')
 
-%% Plot estimation of pitch angle without correction
+%% Plot estimation of pitch angle without acceleration offset correction
 figure('units','normalized','outerposition',[0 0 1 1])
     
     annotation('textbox', [0 0.9 1 0.1], ...
@@ -273,19 +400,35 @@ figure('units','normalized','outerposition',[0 0 1 1])
 hold on
 for n = 1 : nFiles
     if(n == 1)
-         errorbar(n,data.pitch.mean.(dataName{n,m}),...
-               data.pitch.std.(dataName{n,m}),...
+         errorbar(n,data.accPitch.mean.(dataName{n,m}),...
+               data.accPitch.std.(dataName{n,m}),...
                'ob',...
                'HandleVisibility','on')
-    plot(n,targetPitchAngle(n),...
-           '*r',...
-           'HandleVisibility','on')
+         errorbar(n,data.potiPitch.LR.mean.(dataName{n,m}),...
+                  data.potiPitch.LR.std.(dataName{n,m}),...
+                  'og',...
+                  'HandleVisibility','on')
+         errorbar(n,data.potiPitch.RL.mean.(dataName{n,m}),...
+                  data.potiPitch.RL.std.(dataName{n,m}),...
+                  'ok',...
+                  'HandleVisibility','on')
+         plot(n,targetPitchAngle(n),...
+              '*r',...
+              'HandleVisibility','on')
     else
-        errorbar(n,data.pitch.mean.(dataName{n,m}),...
-                   data.pitch.std.(dataName{n,m}),...
+        errorbar(n,data.accPitch.mean.(dataName{n,m}),...
+                   data.accPitch.std.(dataName{n,m}),...
                    'ob',...
                    'HandleVisibility','off')
-        plot(n,targetPitchAngle(n),...
+        errorbar(n,data.potiPitch.LR.mean.(dataName{n,m}),...
+                  data.potiPitch.LR.std.(dataName{n,m}),...
+                  'og',...
+                  'HandleVisibility','off')
+        errorbar(n,data.potiPitch.RL.mean.(dataName{n,m}),...
+                  data.potiPitch.RL.std.(dataName{n,m}),...
+                  'ok',...
+                  'HandleVisibility','off')
+         plot(n,targetPitchAngle(n),...
                '*r',...
                'HandleVisibility','off')
     end
@@ -298,7 +441,8 @@ xlim([0 nFiles+1])
 grid minor
 xlabel('Load Condition')
 ylabel('Pitch angle (°)')
-legend('Calculated','Target Value')
+legend('Aceleration Data','Potentiometer Data LR','Potentiometer Data RL','Target Value')
+
 %% Plot estimation of pitch angle with offset correction
 figure('units','normalized','outerposition',[0 0 1 1])
     
@@ -311,17 +455,17 @@ figure('units','normalized','outerposition',[0 0 1 1])
 hold on
 for n = 1 : nFiles
     if n == 1
-       errorbar(n,data.pitch.mean.(dataName{n,m})-...
-               data.pitch.mean.(dataName{nOffset,mOffset}),...
-               data.pitch.std.(dataName{n,m}),...
+       errorbar(n,data.accPitch.mean.(dataName{n,m})-...
+               data.accPitch.mean.(dataName{nOffset,mOffset}),...
+               data.accPitch.std.(dataName{n,m}),...
                'ob',...
                'HandleVisibility','on')
     plot(n,targetPitchAngle(n),'*r',...
          'HandleVisibility','on') 
     else
-        errorbar(n,data.pitch.mean.(dataName{n,m})-...
-                   data.pitch.mean.(dataName{nOffset,mOffset}),...
-                   data.pitch.std.(dataName{n,m}),...
+        errorbar(n,data.accPitch.mean.(dataName{n,m})-...
+                   data.accPitch.mean.(dataName{nOffset,mOffset}),...
+                   data.accPitch.std.(dataName{n,m}),...
                    'ob',...
                    'HandleVisibility','off')
         plot(n,targetPitchAngle(n),'*r',...

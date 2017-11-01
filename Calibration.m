@@ -2,7 +2,13 @@ clear;
 clc;
 close all;
 
-%% Some values
+
+%% Add Cal_Data Path
+currentPath = pwd;
+addpath(genpath(currentPath));
+clear currentPath;
+
+%% Values hav to been set 
 cal.settings.samplingFreq = 40;
 cal.settings.f_tim = 18e6;
 cal.acc.range = 2;            % Possible values 2, 4, 8, 16 
@@ -11,20 +17,6 @@ cal.gyro.range = 500;         % Possible values 250, 500, 1000, 2000
 %% Veihicle parameters
 cal.lvh = 0.325; % Radstand
 
-
-%% Load Calibration file and separate vectors 
-calDataControll = load('CalData_Stearing_Throttle.txt');
-calDataPoti = load('CalData_Poti.txt');
-t_controll = (0 : 1/cal.settings.samplingFreq :(length(calDataControll(:,1))-1) *...
-                                  1/cal.settings.samplingFreq)';
-t_poti = (0 : 1/cal.settings.samplingFreq :(length(calDataPoti(:,1))-1) *...
-                                  1/cal.settings.samplingFreq)';
-throttle = calDataControll(:,1);
-steering = calDataControll(:,2);
-potiHL = calDataPoti(:,11);
-potiHR = calDataPoti(:,12);
-potiFR = calDataPoti(:,13);
-potiFL = calDataPoti(:,14);
 
 %% Set Acceleration and Gyro conversion factor
 
@@ -49,6 +41,116 @@ switch (cal.gyro.range)
     case 2000
         cal.gyro.mult = 1/16.4;
 end
+
+%% Poti Calibration
+
+% Data for front Axle
+potiDataV = {'Cal1_Poti_V_0.TXT';
+              'Cal1_Poti_V_2.TXT';
+              'Cal1_Poti_V_4.TXT';
+              'Cal1_Poti_V_6.TXT';
+              'Cal1_Poti_V_8.TXT';
+              'Cal1_Poti_V_10.TXT';
+              'Cal1_Poti_V_12.TXT';
+              'Cal1_Poti_V_14.TXT';
+              'Cal1_Poti_V_16.TXT';
+              'Cal1_Poti_V_18.TXT';
+              'Cal1_Poti_V_20.TXT';
+              'Cal1_Poti_V_22.TXT';
+              'Cal1_Poti_V_24.TXT';
+              'Cal1_Poti_V_26.TXT';
+              'Cal1_Poti_V_28.TXT';
+              'Cal1_Poti_V_30.TXT';
+              'Cal1_Poti_V_32.TXT';
+              'Cal1_Poti_V_34.TXT';
+              'Cal1_Poti_V_36.TXT';
+              'Cal1_Poti_V_38.TXT'};
+
+springTravelV = [0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38];
+nStepsV = size(potiDataV,1);
+
+
+potiValueFR = zeros(nStepsV,1);
+potiValueFL = zeros(nStepsV,1);
+
+for n = 1 : nStepsV % Load only the necessary data for front axle
+    temp = load(potiDataV{n});
+    potiValueFR(n) = mean(temp(:,13));
+    potiValueFL(n) = mean(temp(:,14));
+    clear temp;
+end
+
+% poti offset calibration data
+calDataPoti = load('CalData_Poti.txt');
+
+t_poti = (0 : 1/cal.settings.samplingFreq :(length(calDataPoti(:,1))-1) *...
+                                  1/cal.settings.samplingFreq)';
+potiOffsetHL = calDataPoti(:,11);
+potiOffsetHR = calDataPoti(:,12);
+potiOffsetFR = calDataPoti(:,13);
+potiOffsetFL = calDataPoti(:,14);
+
+
+
+% Fit a linear model to the data
+[rPotiFR, aPotiFR, bPotiFR] = regression(potiValueFR,springTravelV','one');
+fitPotiFR = polyval([aPotiFR bPotiFR], min(potiValueFR):max(potiValueFR));
+cal.potiFR.polyVal = [aPotiFR bPotiFR];
+
+[rPotiFL, aPotiFL, bPotiFL] = regression(potiValueFL,springTravelV','one');
+fitPotiFL = polyval([aPotiFL bPotiFL], min(potiValueFL):max(potiValueFL));
+
+% Set intersept to neutral position (without load)
+% Caluculating the offset
+cal.offsetPotiFR = mean(polyval(aPotiFR,potiOffsetFR));
+cal.offsetPotiFL = mean(polyval(aPotiFL,potiOffsetFL));
+
+
+% Set cal values for potis
+cal.potiFL.polyVal = [aPotiFL bPotiFL];
+
+figure('units','normalized','outerposition',[0 0 1 1])
+
+annotation('textbox', [0 0.9 1 0.1], ...
+               'String',...
+               'Potentiometer Calibration',...
+               'EdgeColor', 'none', ...
+               'HorizontalAlignment', 'center',...
+               'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+subplot(2,2,1)
+hold on
+plot(potiValueFL,springTravelV,'-*b')
+plot(min(potiValueFL):max(potiValueFL),fitPotiFL,'--r')
+hold off
+grid minor
+xlabel('ADC Poti Value (-)')
+ylabel('\Delta Spring Travel (mm)')
+title('Calibration potentiometer front left')
+legend('measured','fitted','Location','northwest')
+
+
+subplot(2,2,2)
+hold on
+plot(potiValueFR,springTravelV,'-*b')
+plot(min(potiValueFR):max(potiValueFR),fitPotiFR,'--r')
+hold off
+grid minor
+xlabel('ADC Poti Value (-)')
+ylabel('\Delta Spring Travel (mm)')
+title('Calibration potentiometer front right')
+legend('measured','fitted','Location','northwest')
+
+%% Load Calibration file and separate vectors 
+calDataControll = load('CalData_Stearing_Throttle.txt');
+
+t_controll = (0 : 1/cal.settings.samplingFreq :(length(calDataControll(:,1))-1) *...
+                                  1/cal.settings.samplingFreq)';
+
+throttle = calDataControll(:,1);
+steering = calDataControll(:,2);
+
+
+
 
 %% Set wheel speed factors
 cal.wheel.n = (cal.settings.f_tim * 60) / 2; % Conversion faktor for wheel speed 
@@ -167,45 +269,6 @@ grid minor
 ylabel('left turn \leftarrow 0 \rightarrow right turn')
 hold off
 
-%% Potentiometer calibratiotion
-
-% Conversion value from ADC value to degrees
-cal.angleGain = 340/4095; % 340° electrical travel see datatsheet and 4095 max ADC Value
-cal.rearLeaver = 27;
-cal.frontLeaver = 25;
-
-
-% Caluculating the offset
-cal.offsetPotiHR = mean(potiHR);
-cal.offsetPotiHL = mean(potiHL);
-cal.offsetPotiFR = mean(potiFR);
-cal.offsetPotiFL = mean(potiFL);
-
-% Calculating ADC values to degrees and subtract mean
-travelHR = (sin(((potiHR - cal.offsetPotiHR) * cal.angleGain)*pi/180)) * cal.rearLeaver;
-travelHL = (sin(((potiHL - cal.offsetPotiHL) * cal.angleGain)*pi/180)) * cal.rearLeaver;
-travelFR = (sin(((potiFR - cal.offsetPotiFR) * cal.angleGain)*pi/180)) * cal.frontLeaver;
-travelFL = (sin(((potiFL - cal.offsetPotiFL) * cal.angleGain)*pi/180)) * cal.frontLeaver;
-
-figure('units','normalized','outerposition',[0 0 1 1])
-
-subplot(2,1,1)
-hold on
-plot(t_poti,potiHR);
-plot(t_poti,potiHL);
-plot(t_poti,potiFR);
-plot(t_poti,potiFL);
-hold off
-
-subplot(2,1,2)
-hold on
-plot(t_poti,travelHR);
-plot(t_poti,travelHL);
-plot(t_poti,travelFR);
-plot(t_poti,travelFL);
-hold off
-
-
 %% Ask user if he wants to save the cal struct
 saveCal = input('Would you like to save the calibration values? (Y/N) ', 's');
 if strcmp(saveCal, 'Y')
@@ -214,4 +277,7 @@ if strcmp(saveCal, 'Y')
 else
     fprintf('\nCalibration struct NOT saved!\n');
 end
+
+%% Test calibration for Poti
+
 

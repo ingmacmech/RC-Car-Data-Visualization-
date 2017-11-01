@@ -4,7 +4,7 @@ clear;
 close all
 % Test data file
 
-dataName = {'LOG9'};
+dataName = {'Test31_900g_H_Steigung3_Dyn_1'};
 
 loadMatrix = [1];
 
@@ -41,3 +41,4 @@ loadMatrix = [      0             ,          0            ,             0 ;
                 
 save('dataSet_2.mat','dataName','loadMatrix');
 clear dataName loadMatrix
+

@@ -16,7 +16,7 @@ nameNN = 'nn_data.mat';
 nColumns = 15;              % The number of columns in the data file + 1
 
 %% Plot Controlls
-orginalOverlay = false;
+orginalOverlay = true;
 
 
 
@@ -399,12 +399,12 @@ for n = 1 : nFiles
             if(nColumns > 11)                     
                 data.pitch.poti.LR.(dataName{n,m}) =...
                     atan((data.ing.(dataName{n,m})(:,c.dHR) - ...
-                          data.ing.(dataName{n,m})(:,c.dFL))/cal.lvh)*...
+                          data.ing.(dataName{n,m})(:,c.dFL))/(cal.lvh*1000))*...
                           180/pi;
 
                 data.pitch.poti.RL.(dataName{n,m}) =...
                     atan((data.ing.(dataName{n,m})(:,c.dHL) - ...
-                          data.ing.(dataName{n,m})(:,c.dFR))/cal.lvh)*...
+                          data.ing.(dataName{n,m})(:,c.dFR))/(cal.lvh*1000))*...
                           180/pi;
             end
         end
@@ -618,6 +618,69 @@ for n = 1 : nFiles
     end
 end
 
+%% Plot Poti data
+if(nColumns > 11)
+for n = 1 : nFiles
+    for m = 1 : mFiles
+        if (flagMatrix(n,m) == true)
+            
+            figure('units','normalized','outerposition',[0 0 1 1])
+            
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            strcat({''},dataName{n,m},...
+            {' Potentiometer Data'}),...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+            
+            subplot(4,1,1)
+            hold on
+            plot(data.filtered.(dataName{n,m})(:,c.t),...
+                 data.filtered.(dataName{n,m})(:,c.dFL))
+            
+            if(orginalOverlay == true)
+            plot(data.ing.(dataName{n,m})(:,c.t),...
+                 data.ing.(dataName{n,m})(:,c.dFL))
+            end
+            hold off
+            
+            subplot(4,1,2)
+            hold on
+            plot(data.filtered.(dataName{n,m})(:,c.t),...
+                 data.filtered.(dataName{n,m})(:,c.dFR))
+            
+            if(orginalOverlay == true)
+            plot(data.ing.(dataName{n,m})(:,c.t),...
+                 data.ing.(dataName{n,m})(:,c.dFR))
+            end
+            hold off
+            
+            subplot(4,1,3)
+            hold on
+            plot(data.filtered.(dataName{n,m})(:,c.t),...
+                 data.filtered.(dataName{n,m})(:,c.dHL))
+            
+            if(orginalOverlay == true)
+            plot(data.ing.(dataName{n,m})(:,c.t),...
+                 data.ing.(dataName{n,m})(:,c.dHL))
+            end
+            hold off
+            
+            subplot(4,1,4)
+            hold on
+            plot(data.filtered.(dataName{n,m})(:,c.t),...
+                 data.filtered.(dataName{n,m})(:,c.dHR))
+            
+            if(orginalOverlay == true)
+            plot(data.ing.(dataName{n,m})(:,c.t),...
+                 data.ing.(dataName{n,m})(:,c.dHR))
+            end
+            hold off
+        end
+    end
+end
+end
 
 %% Plot g-force data scatter 
 for n = 1 : nFiles
@@ -663,7 +726,7 @@ for n = 1 : nFiles
     figure('units','normalized','outerposition',[0 0 1 1])
             annotation('textbox', [0 0.9 1 0.1], ...
             'String',...
-            strcat({''},dataName{n},...
+            strcat({''},dataName{n,m},...
            {' Acceleration data and corresponding RC-Controll values'}),...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center',...
