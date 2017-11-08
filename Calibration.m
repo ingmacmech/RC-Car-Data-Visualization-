@@ -65,13 +65,71 @@ potiDataV = {'Cal1_Poti_V_0.TXT';
               'Cal1_Poti_V_34.TXT';
               'Cal1_Poti_V_36.TXT';
               'Cal1_Poti_V_38.TXT'};
+          
+% potiDataH = {'Cal1_Poti_H_0.TXT';
+%               'Cal1_Poti_H_2.TXT';
+%               'Cal1_Poti_H_4.TXT';
+%               'Cal1_Poti_H_6.TXT';
+%               'Cal1_Poti_H_8.TXT';
+%               'Cal1_Poti_H_10.TXT';
+%               'Cal1_Poti_H_12.TXT';
+%               'Cal1_Poti_H_14.TXT';
+%               'Cal1_Poti_H_16.TXT';
+%               
+%               'Cal1_Poti_H_20.TXT';
+%               'Cal1_Poti_H_22.TXT';
+%               'Cal1_Poti_H_24.TXT';
+%               'Cal1_Poti_H_26.TXT';
+%               'Cal1_Poti_H_28.TXT';
+%               'Cal1_Poti_H_30.TXT';
+%               'Cal1_Poti_H_32.TXT';
+%               'Cal1_Poti_H_34.TXT';
+%               'Cal1_Poti_H_36.TXT';
+%               'Cal1_Poti_H_38.TXT';
+%               'Cal1_Poti_H_40.TXT';
+%               'Cal1_Poti_H_42.TXT';
+%               'Cal1_Poti_H_44.TXT';
+%               'Cal1_Poti_H_46.TXT'};
 
-springTravelV = [0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38];
+potiDataH = {'Cal2_Poti_H_0.TXT';
+              'Cal2_Poti_H_2.TXT';
+              'Cal2_Poti_H_4.TXT';
+              'Cal2_Poti_H_6.TXT';
+              'Cal2_Poti_H_8.TXT';
+              'Cal2_Poti_H_10.TXT';
+              'Cal2_Poti_H_12.TXT';
+              'Cal2_Poti_H_14.TXT';
+              'Cal2_Poti_H_16.TXT';
+              'Cal2_Poti_H_18.TXT';
+              'Cal2_Poti_H_20.TXT';
+              'Cal2_Poti_H_22.TXT';
+              'Cal2_Poti_H_24.TXT';
+              'Cal2_Poti_H_26.TXT';
+              'Cal2_Poti_H_28.TXT';
+              'Cal2_Poti_H_30.TXT';
+              'Cal2_Poti_H_32.TXT';
+              'Cal2_Poti_H_34.TXT';
+              'Cal2_Poti_H_36.TXT';
+              'Cal2_Poti_H_38.TXT';
+              'Cal2_Poti_H_40.TXT';
+              'Cal2_Poti_H_42.TXT';
+              'Cal2_Poti_H_44.TXT';
+              'Cal2_Poti_H_46.TXT';
+              'Cal2_Poti_H_48.TXT';
+              };
+
+springTravelV = 0:2:38;
+% springTravelH = [0,2,4,6,8,10,12,14,16,20,22,24,26,28,30,32,34,36,38,40,42,44,46];
+springTravelH = 0:2:48;
 nStepsV = size(potiDataV,1);
-
+nStepsH = size(potiDataH,1);
 
 potiValueFR = zeros(nStepsV,1);
 potiValueFL = zeros(nStepsV,1);
+potiValueHR = zeros(nStepsV,1);
+potiValueHL = zeros(nStepsV,1);
+
+
 
 for n = 1 : nStepsV % Load only the necessary data for front axle
     temp = load(potiDataV{n});
@@ -80,8 +138,16 @@ for n = 1 : nStepsV % Load only the necessary data for front axle
     clear temp;
 end
 
+for n = 1 : nStepsH % Load only the necessary data for front axle
+    temp = load(potiDataH{n});
+    potiValueHR(n) = mean(temp(:,12));
+    potiValueHL(n) = mean(temp(:,11));
+    clear temp;
+end
+
+
 % poti offset calibration data
-calDataPoti = load('CalData_Poti.txt');
+calDataPoti = load('Cal3_Pitch_Angle_0g.txt');
 
 t_poti = (0 : 1/cal.settings.samplingFreq :(length(calDataPoti(:,1))-1) *...
                                   1/cal.settings.samplingFreq)';
@@ -95,19 +161,30 @@ potiOffsetFL = calDataPoti(:,14);
 % Fit a linear model to the data
 [rPotiFR, aPotiFR, bPotiFR] = regression(potiValueFR,springTravelV','one');
 fitPotiFR = polyval([aPotiFR bPotiFR], min(potiValueFR):max(potiValueFR));
-cal.potiFR.polyVal = [aPotiFR bPotiFR];
+
 
 [rPotiFL, aPotiFL, bPotiFL] = regression(potiValueFL,springTravelV','one');
 fitPotiFL = polyval([aPotiFL bPotiFL], min(potiValueFL):max(potiValueFL));
 
+[rPotiHR, aPotiHR, bPotiHR] = regression(potiValueHR,springTravelH','one');
+fitPotiHR = polyval([aPotiHR bPotiHR], min(potiValueHR):max(potiValueHR));
+
+[rPotiHL, aPotiHL, bPotiHL] = regression(potiValueHL,springTravelH','one');
+fitPotiHL = polyval([aPotiHL bPotiHL], min(potiValueHL):max(potiValueHL));
+
 % Set intersept to neutral position (without load)
 % Caluculating the offset
-cal.offsetPotiFR = mean(polyval(aPotiFR,potiOffsetFR));
-cal.offsetPotiFL = mean(polyval(aPotiFL,potiOffsetFL));
-
+cal.offsetPotiFR = mean(polyval([aPotiFR bPotiFR],potiOffsetFR));
+cal.offsetPotiFL = mean(polyval([aPotiFL bPotiFL],potiOffsetFL));
+cal.offsetPotiHR = mean(polyval([aPotiHR bPotiHR],potiOffsetHR));
+cal.offsetPotiHL = mean(polyval([aPotiHL bPotiHL],potiOffsetHL));
 
 % Set cal values for potis
 cal.potiFL.polyVal = [aPotiFL bPotiFL];
+cal.potiFR.polyVal = [aPotiFR bPotiFR];
+cal.potiHL.polyVal = [aPotiHL bPotiHL];
+cal.potiHR.polyVal = [aPotiHR bPotiHR];
+
 
 figure('units','normalized','outerposition',[0 0 1 1])
 
@@ -138,6 +215,28 @@ grid minor
 xlabel('ADC Poti Value (-)')
 ylabel('\Delta Spring Travel (mm)')
 title('Calibration potentiometer front right')
+legend('measured','fitted','Location','northwest')
+
+subplot(2,2,3)
+hold on
+plot(potiValueHL,springTravelH,'-*b')
+plot(min(potiValueHL):max(potiValueHL),fitPotiHL,'--r')
+hold off
+grid minor
+xlabel('ADC Poti Value (-)')
+ylabel('\Delta Spring Travel (mm)')
+title('Calibration potentiometer rear left')
+legend('measured','fitted','Location','northwest')
+
+subplot(2,2,4)
+hold on
+plot(potiValueHR,springTravelH,'-*b')
+plot(min(potiValueHR):max(potiValueHR),fitPotiHR,'--r')
+hold off
+grid minor
+xlabel('ADC Poti Value (-)')
+ylabel('\Delta Spring Travel (mm)')
+title('Calibration potentiometer rear right')
 legend('measured','fitted','Location','northwest')
 
 %% Load Calibration file and separate vectors 
