@@ -10,8 +10,8 @@ close all;
 savePCA = false;
 namePCA = 'nn_data.mat';
 
-saveNN = false;
-nameNN = 'nn_Test_1.mat';
+saveNN = true;
+nameNN = 'nn_Train_1.mat';
 
 nColumns = 15;              % The number of columns in the data file + 1
 
@@ -24,7 +24,7 @@ plotPitchAngle      = true;
 plotSpeedData       = true;
 plotGforceScatter   = false;
 plotControllAccData = false;
-plotAccVsControl    = true;
+plotAccVsControl    = false;
 plotHist            = false;
 plotPSD             = false;
 
@@ -42,7 +42,7 @@ load('cal');
 dataType = {'.txt'};
 
 % dataSet_1: Includes only data with slope = 0 and weight 0g and 900g
-load('dataSet_Test.mat');
+load('dataSet_Train.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot

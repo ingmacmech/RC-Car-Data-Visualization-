@@ -18,13 +18,13 @@ t = output';
 trainFcn = 'trainlm';  % Levenberg-Marquardt backpropagation.
 
 % Create a Fitting Network
-hiddenLayerSize = 80;
+hiddenLayerSize = 150;
 net = fitnet(hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
 % For a list of all processing functions type: help nnprocess
-net.input.processFcns = {'removeconstantrows','mapminmax'};
-net.output.processFcns = {'removeconstantrows','mapminmax'};
+net.input.processFcns = {'mapminmax'};
+net.output.processFcns = {'mapminmax'};
 
 % Setup Division of Data for Training, Validation, Testing
 % For a list of all data division functions type: help nndivide

@@ -4,9 +4,9 @@ close all
 clc
 
 %% Controlls
-nn_learning = false; 
+nn_learning = true; 
 
-trainDataName = 'nn_Test_1.mat';
+trainDataName = 'nn_Train_1.mat';
 
 %Preprocess Neuronal Network
 run('Preprocessing_NN.m');
