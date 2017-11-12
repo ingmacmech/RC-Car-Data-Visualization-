@@ -10,13 +10,13 @@ close all;
 savePCA = false;
 namePCA = 'nn_data.mat';
 
-saveNN = false;
+saveNN = true;
 nameNN = 'nn_data.mat';
 
 nColumns = 15;              % The number of columns in the data file + 1
 
 %% Plot Controlls
-orginalOverlay = true;
+orginalOverlay = false;
 
 
 
@@ -34,7 +34,7 @@ load('cal');
 dataType = {'.txt'};
 
 % dataSet_1: Includes only data with slope = 0 and weight 0g and 900g
-load('Poti_Test.mat');
+load('dataSet_LAB.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
@@ -60,6 +60,7 @@ c.dHL=12;     % Column 12 Axle height front right
 c.dHR=13;     % Column 13 Axle height front left
 c.dFR=14;     % Column 14 Axle height back right
 c.dFL=15;     % Column 15 Axle height front left
+
 
 %% Marker styles 
 markerType = {'o','+','*','.','x','s','d','^','v','>','<','p','h'};
@@ -177,40 +178,41 @@ for n = 1 : nFiles
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                     case c.dFL
-                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dFL) -...
-                                     cal.offsetPotiFL) *...
-                                     cal.angleGain)*pi/180)) * cal.frontLeaver; 
+                        temp = polyval(cal.potiFL.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dFL))-...
+                                cal.offsetPotiFL; 
                         
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                         
                     case c.dFR
-                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dFR) -...
-                                     cal.offsetPotiFR) *...
-                                     cal.angleGain)*pi/180)) * cal.frontLeaver;
+                        temp = polyval(cal.potiFR.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dFR))-...
+                                cal.offsetPotiFR;
                         
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                         
                     case c.dHL
-                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dHL) -...
-                                     cal.offsetPotiHL) *...
-                                     cal.angleGain)*pi/180)) * cal.rearLeaver;
+                        temp = polyval(cal.potiHL.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dHL))-...
+                                cal.offsetPotiHL;
                         
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
                         
                     case c.dHR
-                        temp = (sin(((data.raw.(dataName{n,m})(:,c.dHR) -...
-                                     cal.offsetPotiHR) *...
-                                     cal.angleGain)*pi/180)) * cal.rearLeaver;
+                        temp = polyval(cal.potiHR.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dHR))-...
+                                cal.offsetPotiHR;
                         
                         data.ing.(dataName{n,m}) =...
                                           [data.ing.(dataName{n,m}), temp];
                         clear temp;
+                    
                 end 
             end
         end
@@ -285,25 +287,26 @@ for n = 1 : nFiles
                            smooth(data.ing.(dataName{n,m})(:,c.gz),...
                            0.0021,'rloess')];
                    case c.dFL
+                       % Not filtered
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                            smooth(data.ing.(dataName{n,m})(:,c.dFL),...
-                            0.0021,'rloess')];
+                            data.ing.(dataName{n,m})(:,c.dFL)];
                    case c.dFR
+                       % Not filtered
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                            smooth(data.ing.(dataName{n,m})(:,c.dFR),...
-                            0.0021,'rloess')];
+                            data.ing.(dataName{n,m})(:,c.dFR)];
                    case c.dHL
+                       % Not filtered
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                            smooth(data.ing.(dataName{n,m})(:,c.dHL),...
-                            0.0021,'rloess')];
+                            data.ing.(dataName{n,m})(:,c.dHL)];
                    case c.dHR
+                       % Not filtered
                        data.filtered.(dataName{n,m}) =...
                            [data.filtered.(dataName{n,m}),...
-                            smooth(data.ing.(dataName{n,m})(:,c.dHR),...
-                            0.0021,'rloess')];
+                            data.ing.(dataName{n,m})(:,c.dHR)];
+                        
                end
             end
         end
@@ -324,7 +327,7 @@ for n = 1 : nFiles
         if (flagMatrix(n,m) == true)
             % Put different datasets togeter
             if(firstEnteringFlag == true)
-                data.pca.set = data.ing.(dataName{n,m})(:,2:11);
+                data.pca.set = data.filtered.(dataName{n,m})(:,2:11);
                 if(loadMatrix(n,m) > 0)
                     data.pca.label =...
                     ones(size(data.ing.(dataName{n,m}),1),1) *...
@@ -336,7 +339,7 @@ for n = 1 : nFiles
                     firstEnteringFlag = false;
             else
                 data.pca.set = [data.pca.set;...
-                                data.ing.(dataName{n,m})(:,2:11)];
+                                data.filtered.(dataName{n,m})(:,2:11)];
                 if(loadMatrix(n,m) > 0)
                     data.pca.label =...
                              [data.pca.label;...
@@ -359,14 +362,7 @@ if(savePCA == true)
 end
 clear firstEnteringFlag;
 
-%% Prepare data for Neuronal Networks
-% data has alredy been put together in PCA
-nn_input = data.pca.set;
-nn_output = data.pca.label;
 
-if(saveNN == true)
-    save(nameNN,'nn_input','nn_output')
-end
 
 %% Calculating rms value for Data
 data.rms = struct;
@@ -380,6 +376,23 @@ for n = 1 : nFiles
         end
     end
 end
+
+%% Calculating velocity and acceleration from wheel speed
+data.speed = struct;
+data.rms.pitch = struct;
+for n = 1 : nFiles
+    for m = 1 : mFiles
+        if (flagMatrix == true)
+            meanWheelSpeed = (data.filtered.(dataName{n,m})(:,c.nFL)+...
+                              data.filtered.(dataName{n,m})(:,c.nFR))/2;
+            data.speed.(dataName{n,m}) = (108*pi*meanWheelSpeed)/(1000*60);
+            data.speedFilt.(dataName{n,m}) = smooth(data.speed.(dataName{n,m}),0.02,'loess');
+            data.acc.(dataName{n,m}) = (diff(data.speedFilt.(dataName{n,m}))./...
+                                       diff(data.ing.(dataName{n,m})(:,c.t)))/9.81;
+        end
+    end
+end
+
 
 %% Calculating pitch angle with data
 % TODO: use only data in a certain range
@@ -405,6 +418,22 @@ for n = 1 : nFiles
                 data.pitch.poti.RL.(dataName{n,m}) =...
                     atan((data.ing.(dataName{n,m})(:,c.dHL) - ...
                           data.ing.(dataName{n,m})(:,c.dFR))/(cal.lvh*1000))*...
+                          180/pi;
+               data.pitch.poti.dRear.(dataName{n,m}) = (polyval(cal.potiHL.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dHL))-...
+                                cal.offsetPotiHL +...
+                               polyval(cal.potiHR.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dHR))-...
+                                cal.offsetPotiHR)/2;
+               data.pitch.poti.dFront.(dataName{n,m}) = (polyval(cal.potiFL.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dFL))-...
+                                cal.offsetPotiFL +...
+                               polyval(cal.potiFR.polyVal,...
+                                data.raw.(dataName{n,m})(:,c.dFR))-...
+                                cal.offsetPotiFR)/2;
+               data.pitch.poti.HF.(dataName{n,m}) =...
+                   atan((data.pitch.poti.dRear.(dataName{n,m}) - ...
+                          data.pitch.poti.dFront.(dataName{n,m}))/(cal.lvh*1000))*...
                           180/pi;
             end
         end
@@ -474,7 +503,49 @@ for n = 1 : nFiles
     end
 end
 
-%% Plot data vs time
+%% Prepare data for Neuronal Network
+firstEnteringFlag = true;
+if(saveNN == true)
+    for n = 1 : nFiles
+        for m = 1 : mFiles
+            if (flagMatrix(n,m) == true)
+                % Put different datasets togeter
+                if(firstEnteringFlag == true)
+                    nn_input = [data.raw.(dataName{n,m})(1:end-1,2:11),...
+                                   data.acc.(dataName{n,m})];
+                    nn_output = data.pitch.poti.HF.(dataName{n,m})(1:end-1,1);
+                    
+                    nn_loadLabel = ones(...
+                    size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)...
+                    * loadMatrix(n,m);
+                
+                    nn_slopeLabel = ones(...
+                    size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)*...
+                    slopeMatrix(n,m);
+                    
+                    firstEnteringFlag = false;
+                else
+                    nn_input = [nn_input;...
+                                    data.raw.(dataName{n,m})(1:end-1,2:11),...
+                                    data.acc.(dataName{n,m})];
+                    nn_output = [nn_output; data.pitch.poti.HF.(dataName{n,m})(1:end-1,1)];
+                    
+                    nn_loadLabel = [nn_loadLabel;...
+                        ones(size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)...
+                        * loadMatrix(n,m)];
+                    
+                    nn_slopeLabel = [nn_slopeLabel;
+                        ones(size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)*...
+                             slopeMatrix(n,m)];
+                end
+            end
+        end
+    end
+    save(nameNN,'nn_input','nn_output','nn_loadLabel','nn_slopeLabel')
+end
+clear firstEnteringFlag;
+
+%% Plot sensor data vs time
 for n = 1 : nFiles
     for m = 1 : mFiles
         % Check if the data has alredy been ploted. If not plot it
@@ -644,6 +715,10 @@ for n = 1 : nFiles
                  data.ing.(dataName{n,m})(:,c.dFL))
             end
             hold off
+            xlabel('Time (sec)')
+            ylabel('deflection (mm)')
+            grid minor
+            title('Spring deflection front left')
             
             subplot(4,1,2)
             hold on
@@ -655,6 +730,10 @@ for n = 1 : nFiles
                  data.ing.(dataName{n,m})(:,c.dFR))
             end
             hold off
+            xlabel('Time (sec)')
+            ylabel('deflection (mm)')
+            grid minor
+            title('Spring deflection front right')
             
             subplot(4,1,3)
             hold on
@@ -666,6 +745,10 @@ for n = 1 : nFiles
                  data.ing.(dataName{n,m})(:,c.dHL))
             end
             hold off
+            xlabel('Time (sec)')
+            ylabel('deflection (mm)')
+            grid minor
+            title('Spring deflection rear left')
             
             subplot(4,1,4)
             hold on
@@ -677,112 +760,222 @@ for n = 1 : nFiles
                  data.ing.(dataName{n,m})(:,c.dHR))
             end
             hold off
+            xlabel('Time (sec)')
+            ylabel('deflection (mm)')
+            grid minor
+            title('Spring deflection rear right')
         end
     end
 end
 end
 
-%% Plot g-force data scatter 
+%% Plot pitch angle 
+if(nColumns > 11)
 for n = 1 : nFiles
-    figure('units','normalized','outerposition',[0 0 1 1])
-            annotation('textbox', [0 0.9 1 0.1], ...
-            'String',...
-            'g-Force scatter plot',...
-            'EdgeColor', 'none', ...
-            'HorizontalAlignment', 'center',...
-            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-    hold on
-        for m = 1 : mFiles
-            scatter(data.ing.(dataName{n,m})(:,c.ay),...
-                    data.ing.(dataName{n,m})(:,c.ax),20,...
-                    data.ing.(dataName{n,m})(:,c.az),markerType{m});
-        end
-        xlabel('y-Axis (g)')
-        ylabel('x-Axis (g)')
-        grid minor
-        
-        colorbar;       % Set color bar 
-        colormap jet;   % Set colormap to red and blue
-        
-        axis square;
-        axis([-2 2 -2 2]);
-        caxis([-2 2]);
-        viscircles([0 0], 2, 'Color', 'k', 'LineWidth', 1);
-        viscircles([0 0], 1.5, 'Color', 'k', 'LineWidth', 1,...
-                             'LineStyle', ':');
-        viscircles([0 0], 1, 'Color', 'k', 'LineWidth', 1,...
-                             'LineStyle', ':');
-        viscircles([0 0], 0.5, 'Color', 'k', 'LineWidth', 1,...
-                             'LineStyle', ':');
-        legend(dataName(n,:),'interpreter','none')
-        
-        hold off
-    
-end
-
-%% Plot the acceleration data and corresponding RC-Controll values
-for n = 1 : nFiles
-    
-    figure('units','normalized','outerposition',[0 0 1 1])
+    for m = 1 : mFiles
+        if (flagMatrix(n,m) == true)
+            figure('units','normalized','outerposition',[0 0 1 1])
+            
             annotation('textbox', [0 0.9 1 0.1], ...
             'String',...
             strcat({''},dataName{n,m},...
-           {' Acceleration data and corresponding RC-Controll values'}),...
+            {' Calculated pitch angle'}),...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center',...
             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-        
-        subplot(3,1,1)
-           hold on
-           title('x-Axis acceleration and throttle')
-           yyaxis left
-           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ax));
-           ylabel('(g)')
-           ylim([-2 2])
-           grid minor
-           
-           yyaxis right
-           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
-           ylabel('-')
-           xlabel('Time (s)')
-           ylim([-1.5 1.5])
-           legend('x-Axis Acceleration','Throttle')
-           hold off
-           
-        subplot(3,1,2)
-           hold on
-           title('y-Axis acceleration and steering')
-           yyaxis left
-           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ay));
-           ylabel('(g)')
-           ylim([-2 2])
-           grid minor
-           
-           yyaxis right
-           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ste));
-           ylabel('(-)')
-           xlabel('Time (s)')
-           ylim([-1.5 1.5])
-           legend('y-Axis Acceleration','Steering')
-           hold off
-           
-        subplot(3,1,3)
-           hold on
-           title('z-Axis acceleration and throttle')
-           yyaxis left
-           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.az));
-           ylabel('(g)')
-           ylim([-2 2])
-           grid minor
-           
-           yyaxis right
-           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
-           ylabel('(-)')
-           xlabel('Time (s)')
-           ylim([-1.5 1.5])
-           legend('z-Axis Acceleration','Throttle')
-           hold off
+            
+            subplot(4,1,1)
+            hold on
+            plot(data.ing.(dataName{n,m})(:,c.t),data.pitch.poti.LR.(dataName{n,m}))
+            hold off
+            grid minor
+            title('Pitch angle from poti front left and rear right')
+            xlabel('Time (sec)')
+            ylabel('angle (°)')
+            
+            subplot(4,1,2)
+            hold on
+            plot(data.ing.(dataName{n,m})(:,c.t),data.pitch.poti.RL.(dataName{n,m}))
+            hold off
+            grid minor
+            title('Pitch angle from poti front right and rear left')
+            xlabel('Time (sec)')
+            ylabel('angle (°)')
+            
+            subplot(4,1,3)
+            hold on
+            plot(data.ing.(dataName{n,m})(:,c.t),data.pitch.poti.HF.(dataName{n,m}))
+            hold off
+            grid minor
+            title('Pitch angle from poti front left/right and rear left/right')
+            xlabel('Time (sec)')
+            ylabel('angle (°)')
+            
+            subplot(4,1,4)
+            hold on
+            plot(data.ing.(dataName{n,m})(:,c.t),data.pitch.acc.(dataName{n,m}))
+            hold off
+            grid minor
+            title('Pitch angle from aceleromeer x-Axis and z-Axis')
+            xlabel('Time (sec)')
+            ylabel('angle (°)')
+            
+        end
+    end
 end
+end
+
+%% Plot Speed and acceleration derived from wheel speed
+for n = 1 : nFiles
+    for m = 1 : mFiles
+        if (flagMatrix(n,m) == true)
+            figure('units','normalized','outerposition',[0 0 1 1])
+            
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            strcat({''},dataName{n,m},...
+            {' Calculated speed and acceleration'}),...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+            
+            subplot(3,1,1)
+            hold on
+            plot(data.ing.(dataName{n,m})(:,c.t),data.speed.(dataName{n,m}))
+            plot(data.ing.(dataName{n,m})(:,c.t),data.speedFilt.(dataName{n,m}))
+            hold off
+            grid on
+            grid minor
+            title('Vehicle Speed')
+            xlabel('Time (sec)')
+            ylabel('speed (m/s)')
+            
+            subplot(3,1,2)
+            hold on
+            plot(data.ing.(dataName{n,m})(:,c.t),data.speedFilt.(dataName{n,m})*3.6)
+            hold off
+            grid on
+            grid minor
+            title('Vehicle Speed')
+            xlabel('Time (sec)')
+            ylabel('speed (km/h)')
+            
+            subplot(3,1,3)
+            hold on
+            plot(data.ing.(dataName{n,m})(1:end-1,c.t),data.acc.(dataName{n,m}))
+            hold off
+            grid on
+            grid minor
+            title('Vehicle Acceleration')
+            xlabel('Time (sec)')
+            ylabel('acc (g)')
+            
+                        
+        end
+    end
+end
+
+%% Plot g-force data scatter 
+% for n = 1 : nFiles
+%     figure('units','normalized','outerposition',[0 0 1 1])
+%             annotation('textbox', [0 0.9 1 0.1], ...
+%             'String',...
+%             'g-Force scatter plot',...
+%             'EdgeColor', 'none', ...
+%             'HorizontalAlignment', 'center',...
+%             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+%     hold on
+%         for m = 1 : mFiles
+%             scatter(data.ing.(dataName{n,m})(:,c.ay),...
+%                     data.ing.(dataName{n,m})(:,c.ax),20,...
+%                     data.ing.(dataName{n,m})(:,c.az),markerType{m});
+%         end
+%         xlabel('y-Axis (g)')
+%         ylabel('x-Axis (g)')
+%         grid minor
+%         
+%         colorbar;       % Set color bar 
+%         colormap jet;   % Set colormap to red and blue
+%         
+%         axis square;
+%         axis([-2 2 -2 2]);
+%         caxis([-2 2]);
+%         viscircles([0 0], 2, 'Color', 'k', 'LineWidth', 1);
+%         viscircles([0 0], 1.5, 'Color', 'k', 'LineWidth', 1,...
+%                              'LineStyle', ':');
+%         viscircles([0 0], 1, 'Color', 'k', 'LineWidth', 1,...
+%                              'LineStyle', ':');
+%         viscircles([0 0], 0.5, 'Color', 'k', 'LineWidth', 1,...
+%                              'LineStyle', ':');
+%         legend(dataName(n,:),'interpreter','none')
+%         
+%         hold off
+%     
+% end
+
+%% Plot the acceleration data and corresponding RC-Controll values
+% for n = 1 : nFiles
+%     
+%     figure('units','normalized','outerposition',[0 0 1 1])
+%             annotation('textbox', [0 0.9 1 0.1], ...
+%             'String',...
+%             strcat({''},dataName{n,m},...
+%            {' Acceleration data and corresponding RC-Controll values'}),...
+%             'EdgeColor', 'none', ...
+%             'HorizontalAlignment', 'center',...
+%             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+%         
+%         subplot(3,1,1)
+%            hold on
+%            title('x-Axis acceleration and throttle')
+%            yyaxis left
+%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ax));
+%            ylabel('(g)')
+%            ylim([-2 2])
+%            grid minor
+%            
+%            yyaxis right
+%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
+%            ylabel('-')
+%            xlabel('Time (s)')
+%            ylim([-1.5 1.5])
+%            legend('x-Axis Acceleration','Throttle')
+%            hold off
+%            
+%         subplot(3,1,2)
+%            hold on
+%            title('y-Axis acceleration and steering')
+%            yyaxis left
+%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ay));
+%            ylabel('(g)')
+%            ylim([-2 2])
+%            grid minor
+%            
+%            yyaxis right
+%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ste));
+%            ylabel('(-)')
+%            xlabel('Time (s)')
+%            ylim([-1.5 1.5])
+%            legend('y-Axis Acceleration','Steering')
+%            hold off
+%            
+%         subplot(3,1,3)
+%            hold on
+%            title('z-Axis acceleration and throttle')
+%            yyaxis left
+%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.az));
+%            ylabel('(g)')
+%            ylim([-2 2])
+%            grid minor
+%            
+%            yyaxis right
+%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
+%            ylabel('(-)')
+%            xlabel('Time (s)')
+%            ylim([-1.5 1.5])
+%            legend('z-Axis Acceleration','Throttle')
+%            hold off
+% end
 
 %% Plot each acceleration axis data vs RC-Controll values
 for n = 1 : nFiles
@@ -927,85 +1120,85 @@ for n = 1 : nFiles
 end
 
 %% Plot power spectral density
-for n = 1 : nFiles
-    figure('units','normalized','outerposition',[0 0 1 1])
-            annotation('textbox', [0 0.9 1 0.1], ...
-            'String',...
-            ' Welch Power Spectral Density Estimation',...
-            'EdgeColor', 'none', ...
-            'HorizontalAlignment', 'center',...
-            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-     
-     subplot(2,3,1)
-        hold on
-        for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),...
-                 db(data.psd.(dataName{n,m})(:,2)));
-        end
-        title('Acceleration x-Axis')
-        xlabel('Frequency (Hz)')
-        ylabel('Power/Frequency (db/Hz)')
-        legend(dataName(n,:),'interpreter','none')
-        hold off
-        
-     subplot(2,3,2)
-        hold on
-        for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),...
-                 db(data.psd.(dataName{n,m})(:,3)));
-        end
-        title('Acceleration y-Axis')
-        xlabel('Frequency (Hz)')
-        ylabel('Power/Frequency (db/Hz)')
-        legend(dataName(n,:),'interpreter','none')
-        hold off
-        
-     subplot(2,3,3)
-        hold on
-        for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),...
-                 db(data.psd.(dataName{n,m})(:,4)));
-        end
-        title('Acceleration z-Axis')
-        xlabel('Frequency (Hz)')
-        ylabel('Power/Frequency (db/Hz)')
-        legend(dataName(n,:),'interpreter','none')
-        hold off
-        
-    subplot(2,3,4)
-        hold on
-        for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),...
-                 db(data.psd.(dataName{n,m})(:,5)));
-        end
-        title('Gyroscope x-Axis')
-        xlabel('Frequency (Hz)')
-        ylabel('Power/Frequency (db/Hz)')
-        legend(dataName(n,:),'interpreter','none')
-        hold off
-        
-    subplot(2,3,5)
-        hold on
-        for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),...
-                 db(data.psd.(dataName{n,m})(:,6)));
-        end
-        title('Gyroscope y-Axis')
-        xlabel('Frequency (Hz)')
-        ylabel('Power/Frequency (db/Hz)')
-        legend(dataName(n,:),'interpreter','none')
-        hold off
-        
-    subplot(2,3,6)
-        hold on
-        for m = 1 : mFiles
-            plot(data.psd.(dataName{n,m})(:,1),...
-                 db(data.psd.(dataName{n,m})(:,7)));
-        end
-        title('Gyroscope z-Axis')
-        xlabel('Frequency (Hz)')
-        ylabel('Power/Frequency (db/Hz)')
-        legend(dataName(n,:),'interpreter','none')
-        hold off
-end
+% for n = 1 : nFiles
+%     figure('units','normalized','outerposition',[0 0 1 1])
+%             annotation('textbox', [0 0.9 1 0.1], ...
+%             'String',...
+%             ' Welch Power Spectral Density Estimation',...
+%             'EdgeColor', 'none', ...
+%             'HorizontalAlignment', 'center',...
+%             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+%      
+%      subplot(2,3,1)
+%         hold on
+%         for m = 1 : mFiles
+%             plot(data.psd.(dataName{n,m})(:,1),...
+%                  db(data.psd.(dataName{n,m})(:,2)));
+%         end
+%         title('Acceleration x-Axis')
+%         xlabel('Frequency (Hz)')
+%         ylabel('Power/Frequency (db/Hz)')
+%         legend(dataName(n,:),'interpreter','none')
+%         hold off
+%         
+%      subplot(2,3,2)
+%         hold on
+%         for m = 1 : mFiles
+%             plot(data.psd.(dataName{n,m})(:,1),...
+%                  db(data.psd.(dataName{n,m})(:,3)));
+%         end
+%         title('Acceleration y-Axis')
+%         xlabel('Frequency (Hz)')
+%         ylabel('Power/Frequency (db/Hz)')
+%         legend(dataName(n,:),'interpreter','none')
+%         hold off
+%         
+%      subplot(2,3,3)
+%         hold on
+%         for m = 1 : mFiles
+%             plot(data.psd.(dataName{n,m})(:,1),...
+%                  db(data.psd.(dataName{n,m})(:,4)));
+%         end
+%         title('Acceleration z-Axis')
+%         xlabel('Frequency (Hz)')
+%         ylabel('Power/Frequency (db/Hz)')
+%         legend(dataName(n,:),'interpreter','none')
+%         hold off
+%         
+%     subplot(2,3,4)
+%         hold on
+%         for m = 1 : mFiles
+%             plot(data.psd.(dataName{n,m})(:,1),...
+%                  db(data.psd.(dataName{n,m})(:,5)));
+%         end
+%         title('Gyroscope x-Axis')
+%         xlabel('Frequency (Hz)')
+%         ylabel('Power/Frequency (db/Hz)')
+%         legend(dataName(n,:),'interpreter','none')
+%         hold off
+%         
+%     subplot(2,3,5)
+%         hold on
+%         for m = 1 : mFiles
+%             plot(data.psd.(dataName{n,m})(:,1),...
+%                  db(data.psd.(dataName{n,m})(:,6)));
+%         end
+%         title('Gyroscope y-Axis')
+%         xlabel('Frequency (Hz)')
+%         ylabel('Power/Frequency (db/Hz)')
+%         legend(dataName(n,:),'interpreter','none')
+%         hold off
+%         
+%     subplot(2,3,6)
+%         hold on
+%         for m = 1 : mFiles
+%             plot(data.psd.(dataName{n,m})(:,1),...
+%                  db(data.psd.(dataName{n,m})(:,7)));
+%         end
+%         title('Gyroscope z-Axis')
+%         xlabel('Frequency (Hz)')
+%         ylabel('Power/Frequency (db/Hz)')
+%         legend(dataName(n,:),'interpreter','none')
+%         hold off
+% end
 

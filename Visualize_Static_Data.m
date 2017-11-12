@@ -16,7 +16,7 @@ load('cal');
 
 %% List of data to open and data ending
 dataType = {'.txt'};
-% Data with motor control fan on
+%Data with motor control fan on
 % dataName = {'Cal3_Pitch_Angle_0g';
 %             'Cal3_Pitch_Angle_200g';
 %             'Cal3_Pitch_Angle_400g';
