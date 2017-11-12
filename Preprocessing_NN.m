@@ -2,7 +2,7 @@
 
 %% Load Data
 
-load('nn_data.mat');
+load(trainDataName);
 
 %% Choose witch sensordata to use as input
 % Column 1: Throttle

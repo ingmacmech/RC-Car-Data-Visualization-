@@ -10,15 +10,23 @@ close all;
 savePCA = false;
 namePCA = 'nn_data.mat';
 
-saveNN = true;
-nameNN = 'nn_data.mat';
+saveNN = false;
+nameNN = 'nn_Test_1.mat';
 
 nColumns = 15;              % The number of columns in the data file + 1
 
 %% Plot Controlls
 orginalOverlay = false;
 
-
+plotTimeData        = true;
+plotPotiData        = false;
+plotPitchAngle      = true;
+plotSpeedData       = true;
+plotGforceScatter   = false;
+plotControllAccData = false;
+plotAccVsControl    = true;
+plotHist            = false;
+plotPSD             = false;
 
 
 %% Add path to sub folders
@@ -34,7 +42,7 @@ load('cal');
 dataType = {'.txt'};
 
 % dataSet_1: Includes only data with slope = 0 and weight 0g and 900g
-load('dataSet_LAB.mat');
+load('dataSet_Test.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
@@ -546,6 +554,7 @@ end
 clear firstEnteringFlag;
 
 %% Plot sensor data vs time
+if(plotTimeData == true)
 for n = 1 : nFiles
     for m = 1 : mFiles
         % Check if the data has alredy been ploted. If not plot it
@@ -688,8 +697,10 @@ for n = 1 : nFiles
         end
     end
 end
+end
 
 %% Plot Poti data
+if(plotPotiData == true)
 if(nColumns > 11)
 for n = 1 : nFiles
     for m = 1 : mFiles
@@ -768,8 +779,10 @@ for n = 1 : nFiles
     end
 end
 end
+end
 
-%% Plot pitch angle 
+%% Plot pitch angle
+if(plotPitchAngle == true)
 if(nColumns > 11)
 for n = 1 : nFiles
     for m = 1 : mFiles
@@ -824,8 +837,10 @@ for n = 1 : nFiles
     end
 end
 end
+end
 
 %% Plot Speed and acceleration derived from wheel speed
+if(plotSpeedData == true)
 for n = 1 : nFiles
     for m = 1 : mFiles
         if (flagMatrix(n,m) == true)
@@ -874,110 +889,116 @@ for n = 1 : nFiles
         end
     end
 end
+end
 
-%% Plot g-force data scatter 
-% for n = 1 : nFiles
-%     figure('units','normalized','outerposition',[0 0 1 1])
-%             annotation('textbox', [0 0.9 1 0.1], ...
-%             'String',...
-%             'g-Force scatter plot',...
-%             'EdgeColor', 'none', ...
-%             'HorizontalAlignment', 'center',...
-%             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-%     hold on
-%         for m = 1 : mFiles
-%             scatter(data.ing.(dataName{n,m})(:,c.ay),...
-%                     data.ing.(dataName{n,m})(:,c.ax),20,...
-%                     data.ing.(dataName{n,m})(:,c.az),markerType{m});
-%         end
-%         xlabel('y-Axis (g)')
-%         ylabel('x-Axis (g)')
-%         grid minor
-%         
-%         colorbar;       % Set color bar 
-%         colormap jet;   % Set colormap to red and blue
-%         
-%         axis square;
-%         axis([-2 2 -2 2]);
-%         caxis([-2 2]);
-%         viscircles([0 0], 2, 'Color', 'k', 'LineWidth', 1);
-%         viscircles([0 0], 1.5, 'Color', 'k', 'LineWidth', 1,...
-%                              'LineStyle', ':');
-%         viscircles([0 0], 1, 'Color', 'k', 'LineWidth', 1,...
-%                              'LineStyle', ':');
-%         viscircles([0 0], 0.5, 'Color', 'k', 'LineWidth', 1,...
-%                              'LineStyle', ':');
-%         legend(dataName(n,:),'interpreter','none')
-%         
-%         hold off
-%     
-% end
+%% Plot g-force data scatter
+if(plotGforceScatter == true)
+for n = 1 : nFiles
+    figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            'g-Force scatter plot',...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+    hold on
+        for m = 1 : mFiles
+            scatter(data.ing.(dataName{n,m})(:,c.ay),...
+                    data.ing.(dataName{n,m})(:,c.ax),20,...
+                    data.ing.(dataName{n,m})(:,c.az),markerType{m});
+        end
+        xlabel('y-Axis (g)')
+        ylabel('x-Axis (g)')
+        grid minor
+        
+        colorbar;       % Set color bar 
+        colormap jet;   % Set colormap to red and blue
+        
+        axis square;
+        axis([-2 2 -2 2]);
+        caxis([-2 2]);
+        viscircles([0 0], 2, 'Color', 'k', 'LineWidth', 1);
+        viscircles([0 0], 1.5, 'Color', 'k', 'LineWidth', 1,...
+                             'LineStyle', ':');
+        viscircles([0 0], 1, 'Color', 'k', 'LineWidth', 1,...
+                             'LineStyle', ':');
+        viscircles([0 0], 0.5, 'Color', 'k', 'LineWidth', 1,...
+                             'LineStyle', ':');
+        legend(dataName(n,:),'interpreter','none')
+        
+        hold off
+    
+end
+end
 
 %% Plot the acceleration data and corresponding RC-Controll values
-% for n = 1 : nFiles
-%     
-%     figure('units','normalized','outerposition',[0 0 1 1])
-%             annotation('textbox', [0 0.9 1 0.1], ...
-%             'String',...
-%             strcat({''},dataName{n,m},...
-%            {' Acceleration data and corresponding RC-Controll values'}),...
-%             'EdgeColor', 'none', ...
-%             'HorizontalAlignment', 'center',...
-%             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-%         
-%         subplot(3,1,1)
-%            hold on
-%            title('x-Axis acceleration and throttle')
-%            yyaxis left
-%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ax));
-%            ylabel('(g)')
-%            ylim([-2 2])
-%            grid minor
-%            
-%            yyaxis right
-%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
-%            ylabel('-')
-%            xlabel('Time (s)')
-%            ylim([-1.5 1.5])
-%            legend('x-Axis Acceleration','Throttle')
-%            hold off
-%            
-%         subplot(3,1,2)
-%            hold on
-%            title('y-Axis acceleration and steering')
-%            yyaxis left
-%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ay));
-%            ylabel('(g)')
-%            ylim([-2 2])
-%            grid minor
-%            
-%            yyaxis right
-%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ste));
-%            ylabel('(-)')
-%            xlabel('Time (s)')
-%            ylim([-1.5 1.5])
-%            legend('y-Axis Acceleration','Steering')
-%            hold off
-%            
-%         subplot(3,1,3)
-%            hold on
-%            title('z-Axis acceleration and throttle')
-%            yyaxis left
-%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.az));
-%            ylabel('(g)')
-%            ylim([-2 2])
-%            grid minor
-%            
-%            yyaxis right
-%            plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
-%            ylabel('(-)')
-%            xlabel('Time (s)')
-%            ylim([-1.5 1.5])
-%            legend('z-Axis Acceleration','Throttle')
-%            hold off
-% end
+if(plotControllAccData == true)
+for n = 1 : nFiles
+    
+    figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            strcat({''},dataName{n,m},...
+           {' Acceleration data and corresponding RC-Controll values'}),...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+        
+        subplot(3,1,1)
+           hold on
+           title('x-Axis acceleration and throttle')
+           yyaxis left
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ax));
+           ylabel('(g)')
+           ylim([-2 2])
+           grid minor
+           
+           yyaxis right
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
+           ylabel('-')
+           xlabel('Time (s)')
+           ylim([-1.5 1.5])
+           legend('x-Axis Acceleration','Throttle')
+           hold off
+           
+        subplot(3,1,2)
+           hold on
+           title('y-Axis acceleration and steering')
+           yyaxis left
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ay));
+           ylabel('(g)')
+           ylim([-2 2])
+           grid minor
+           
+           yyaxis right
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.ste));
+           ylabel('(-)')
+           xlabel('Time (s)')
+           ylim([-1.5 1.5])
+           legend('y-Axis Acceleration','Steering')
+           hold off
+           
+        subplot(3,1,3)
+           hold on
+           title('z-Axis acceleration and throttle')
+           yyaxis left
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.az));
+           ylabel('(g)')
+           ylim([-2 2])
+           grid minor
+           
+           yyaxis right
+           plot(data.ing.(dataName{n})(:,c.t),data.ing.(dataName{n})(:,c.thr));
+           ylabel('(-)')
+           xlabel('Time (s)')
+           ylim([-1.5 1.5])
+           legend('z-Axis Acceleration','Throttle')
+           hold off
+end
+end
 
 %% Plot each acceleration axis data vs RC-Controll values
+if(plotAccVsControl == true)
 for n = 1 : nFiles
     figure('units','normalized','outerposition',[0 0 1 1])
             annotation('textbox', [0 0.9 1 0.1], ...
@@ -1068,8 +1089,10 @@ for n = 1 : nFiles
         hold off
     
 end
+end
 
 %% Plot histogramm for acceleration data
+if(plotHist == true)
 for n = 1 : nFiles
      figure('units','normalized','outerposition',[0 0 1 1])
             annotation('textbox', [0 0.9 1 0.1], ...
@@ -1118,87 +1141,89 @@ for n = 1 : nFiles
         legend(dataName(n,:),'interpreter','none')
         hold off
 end
+end
 
 %% Plot power spectral density
-% for n = 1 : nFiles
-%     figure('units','normalized','outerposition',[0 0 1 1])
-%             annotation('textbox', [0 0.9 1 0.1], ...
-%             'String',...
-%             ' Welch Power Spectral Density Estimation',...
-%             'EdgeColor', 'none', ...
-%             'HorizontalAlignment', 'center',...
-%             'FontSize',12, 'FontWeight', 'bold','interpreter','none')
-%      
-%      subplot(2,3,1)
-%         hold on
-%         for m = 1 : mFiles
-%             plot(data.psd.(dataName{n,m})(:,1),...
-%                  db(data.psd.(dataName{n,m})(:,2)));
-%         end
-%         title('Acceleration x-Axis')
-%         xlabel('Frequency (Hz)')
-%         ylabel('Power/Frequency (db/Hz)')
-%         legend(dataName(n,:),'interpreter','none')
-%         hold off
-%         
-%      subplot(2,3,2)
-%         hold on
-%         for m = 1 : mFiles
-%             plot(data.psd.(dataName{n,m})(:,1),...
-%                  db(data.psd.(dataName{n,m})(:,3)));
-%         end
-%         title('Acceleration y-Axis')
-%         xlabel('Frequency (Hz)')
-%         ylabel('Power/Frequency (db/Hz)')
-%         legend(dataName(n,:),'interpreter','none')
-%         hold off
-%         
-%      subplot(2,3,3)
-%         hold on
-%         for m = 1 : mFiles
-%             plot(data.psd.(dataName{n,m})(:,1),...
-%                  db(data.psd.(dataName{n,m})(:,4)));
-%         end
-%         title('Acceleration z-Axis')
-%         xlabel('Frequency (Hz)')
-%         ylabel('Power/Frequency (db/Hz)')
-%         legend(dataName(n,:),'interpreter','none')
-%         hold off
-%         
-%     subplot(2,3,4)
-%         hold on
-%         for m = 1 : mFiles
-%             plot(data.psd.(dataName{n,m})(:,1),...
-%                  db(data.psd.(dataName{n,m})(:,5)));
-%         end
-%         title('Gyroscope x-Axis')
-%         xlabel('Frequency (Hz)')
-%         ylabel('Power/Frequency (db/Hz)')
-%         legend(dataName(n,:),'interpreter','none')
-%         hold off
-%         
-%     subplot(2,3,5)
-%         hold on
-%         for m = 1 : mFiles
-%             plot(data.psd.(dataName{n,m})(:,1),...
-%                  db(data.psd.(dataName{n,m})(:,6)));
-%         end
-%         title('Gyroscope y-Axis')
-%         xlabel('Frequency (Hz)')
-%         ylabel('Power/Frequency (db/Hz)')
-%         legend(dataName(n,:),'interpreter','none')
-%         hold off
-%         
-%     subplot(2,3,6)
-%         hold on
-%         for m = 1 : mFiles
-%             plot(data.psd.(dataName{n,m})(:,1),...
-%                  db(data.psd.(dataName{n,m})(:,7)));
-%         end
-%         title('Gyroscope z-Axis')
-%         xlabel('Frequency (Hz)')
-%         ylabel('Power/Frequency (db/Hz)')
-%         legend(dataName(n,:),'interpreter','none')
-%         hold off
-% end
-
+if(plotPSD == true)
+for n = 1 : nFiles
+    figure('units','normalized','outerposition',[0 0 1 1])
+            annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            ' Welch Power Spectral Density Estimation',...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+     
+     subplot(2,3,1)
+        hold on
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,2)));
+        end
+        title('Acceleration x-Axis')
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        legend(dataName(n,:),'interpreter','none')
+        hold off
+        
+     subplot(2,3,2)
+        hold on
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,3)));
+        end
+        title('Acceleration y-Axis')
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        legend(dataName(n,:),'interpreter','none')
+        hold off
+        
+     subplot(2,3,3)
+        hold on
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,4)));
+        end
+        title('Acceleration z-Axis')
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        legend(dataName(n,:),'interpreter','none')
+        hold off
+        
+    subplot(2,3,4)
+        hold on
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,5)));
+        end
+        title('Gyroscope x-Axis')
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        legend(dataName(n,:),'interpreter','none')
+        hold off
+        
+    subplot(2,3,5)
+        hold on
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,6)));
+        end
+        title('Gyroscope y-Axis')
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        legend(dataName(n,:),'interpreter','none')
+        hold off
+        
+    subplot(2,3,6)
+        hold on
+        for m = 1 : mFiles
+            plot(data.psd.(dataName{n,m})(:,1),...
+                 db(data.psd.(dataName{n,m})(:,7)));
+        end
+        title('Gyroscope z-Axis')
+        xlabel('Frequency (Hz)')
+        ylabel('Power/Frequency (db/Hz)')
+        legend(dataName(n,:),'interpreter','none')
+        hold off
+end
+end
