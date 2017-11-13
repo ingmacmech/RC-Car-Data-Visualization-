@@ -4,7 +4,7 @@ clear;
 close all;
 
 %% Save Plots
-savePlots = false;
+savePlots = true;
 
 %% Data 
 s = [0 3 6 9 12 15]';
