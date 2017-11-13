@@ -23,13 +23,40 @@ inputSize = size(columns,2);
 
 
 %% Set together a new input matrix
-input = zeros(size(nn_input,1),inputSize);
-for n = 1:inputSize
-    input(:,n) = nn_input(:,n);
-end
+
 
 %% Set output matrix
 output = nn_output;
+if (nnLearning == false)
+    switch(nnType)
+        case 'NARX'
+            input = zeros(size(nn_input,1)-nDelays,inputSize);
+            initDelay = nn_input(1:nDelays,:);
+            for n = 1:inputSize
+                input(:,n) = nn_input(nDelays+1:end,n);
+            end
+
+        case 'TDL'
+            input = zeros(size(nn_input,1)-nDelays,inputSize);
+            initDelay = nn_input(1:nDelays,inputSize);
+            for n = 1:inputSize
+                input(:,n) = nn_input(nDelays+1:end,n);
+                initDelay(:,n) = nn_input(1:nDelays,n);
+            end
+            
+
+        case 'FF'
+            input = zeros(size(nn_input,1),inputSize);
+            for n = 1:inputSize
+                input(:,n) = nn_input(:,n);
+            end    
+    end
+else
+    input = zeros(size(nn_input,1),inputSize);
+    for n = 1:inputSize
+        input(:,n) = nn_input(:,n);
+    end
+end
 %% Set load label
 loadLabel = nn_loadLabel;
 %% Set slope label
