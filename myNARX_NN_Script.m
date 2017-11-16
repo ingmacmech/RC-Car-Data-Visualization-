@@ -20,7 +20,7 @@ trainFcn = 'trainlm';  % Levenberg-Marquardt backpropagation.
 % Create a Nonlinear Autoregressive Network with External Input
 inputDelays = 1:40;
 feedbackDelays = 1:40;
-hiddenLayerSize = 20;
+hiddenLayerSize = 40;
 net = narxnet(inputDelays,feedbackDelays,hiddenLayerSize,'open',trainFcn);
 
 % Choose Input and Feedback Pre/Post-Processing Functions
@@ -77,7 +77,7 @@ view(net)
 
 % Plots
 % Uncomment these lines to enable various plots.
-%figure, plotperform(tr)
+figure, plotperform(tr)
 %figure, plottrainstate(tr)
 %figure, ploterrhist(e)
 %figure, plotregression(t,y)
@@ -145,7 +145,7 @@ if (false)
     % deployment in MATLAB scripts or with MATLAB Compiler and Builder
     % tools, or simply to examine the calculations your trained neural
     % network performs.
-    genFunction(net,'myNeuralNetworkFunction');
+    genFunction(netc,'myNeuralNetworkFunction');
     y = myNeuralNetworkFunction(x,xi,ai);
 end
 if (false)
