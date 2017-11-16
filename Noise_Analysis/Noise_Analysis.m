@@ -6,6 +6,7 @@ clc;
 %% Data captured with and without the van
 dataVanON = load('Noise_Van_ON.txt');
 dataVanOFF = load('Noise_Van_OFF.txt');
+load('nn_Test_1.mat');
 
 accDataON = dataVanON(:,5:7) * 1/16384;
 gyroDataON = dataVanON(:,8:10) * 1/65.5;
@@ -14,12 +15,15 @@ accDataOFF = dataVanOFF(:,5:7) * 1/16384;
 gyroDataOFF = dataVanOFF(:,8:10) * 1/65.5;
 
 
+
 ingDataON = [accDataON, gyroDataON];
 ingDataOFF = [accDataOFF, gyroDataOFF];
 
 fHp = HighPassFilter();
+fLp = LowPassFilter();
 
 filteredDataON = filter(fHp,ingDataON,1);
+filteredDataON = filter(fLp,filteredDataON);
 filteredDataOFF = filter(fHp,ingDataOFF,1);
 
 clear accDataON gyroDataON accDataOFF gyroDataOFF
