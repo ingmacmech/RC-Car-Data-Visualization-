@@ -1,7 +1,7 @@
 %% Main Skript for Neuronal network
-clear
-close all
-clc
+% clear
+% close all
+% clc
 
 %% Controlls
 % witch Type of a NN to use
