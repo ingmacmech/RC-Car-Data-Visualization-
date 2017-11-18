@@ -23,8 +23,8 @@ net = fitnet(hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
 % For a list of all processing functions type: help nnprocess
-net.input.processFcns = {'mapminmax'};
-net.output.processFcns = {'mapminmax'};
+%net.input.processFcns = {'mapminmax'};
+%net.output.processFcns = {'mapminmax'};
 
 % Setup Division of Data for Training, Validation, Testing
 % For a list of all data division functions type: help nndivide
@@ -84,8 +84,8 @@ end
 if (true)
     % Generate a matrix-only MATLAB function for neural network code
     % generation with MATLAB Coder tools.
-    genFunction(net,'myNeuralNetworkFunction','MatrixOnly','yes');
-    y = myNeuralNetworkFunction(x);
+    genFunction(net,'myNeuralNetworkFunction_2','MatrixOnly','yes');
+    y = myNeuralNetworkFunction_2(x);
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.

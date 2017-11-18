@@ -18,14 +18,14 @@ T = tonndata(output,false,false);
 trainFcn = 'trainlm';  % Levenberg-Marquardt backpropagation.
 
 % Create a Time Delay Network
-inputDelays = 1:10;
-hiddenLayerSize = 80;
+inputDelays = 1:40;
+hiddenLayerSize = 150;
 net = timedelaynet(inputDelays,hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
 % For a list of all processing functions type: help nnprocess
-net.input.processFcns = {'removeconstantrows','mapminmax'};
-net.output.processFcns = {'removeconstantrows','mapminmax'};
+%net.input.processFcns = {'removeconstantrows','mapminmax'};
+%net.output.processFcns = {'removeconstantrows','mapminmax'};
 
 % Prepare the Data for Training and Simulation
 % The function PREPARETS prepares timeseries data for a particular network,
@@ -108,13 +108,13 @@ if (false)
     genFunction(net,'myNeuralNetworkFunction');
     y = myNeuralNetworkFunction(x,xi,ai);
 end
-if (false)
+if (true)
     % Generate a matrix-only MATLAB function for neural network code
     % generation with MATLAB Coder tools.
-    genFunction(net,'myNeuralNetworkFunction','MatrixOnly','yes');
-    x1 = cell2mat(x(1,:));
-    xi1 = cell2mat(xi(1,:));
-    y = myNeuralNetworkFunction(x1,xi1);
+    genFunction(net,'myTDL_NN_Function_1','MatrixOnly','yes');
+    %x1 = cell2mat(x(1,:));
+    %xi1 = cell2mat(xi(1,:));
+    %y = myNeuralNetworkFunction_1(x1,xi1);
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.

@@ -11,7 +11,7 @@
 nnType = 'FF';
 nDelays = 10;
 
-nnLearning = false;
+nnLearning = true;
 
 
 
@@ -22,12 +22,16 @@ run('Preprocessing_NN.m');
 
 % Neuronal network learning
 if(nnLearning == true)
-    run('NN_Skript.m');
+    run('myTDL_NN_Script.m');
 end
+
+X = tonndata(input,false,false);
+T = tonndata(output,false,false);
+[xs,xis,ais,ts] = preparets(net,X,T);
 
 % Procces data throu neuronal network
 %nn_output = myTDL_NN_Function(input',initDelay')';
-nn_output = myNeuralNetworkFunction(input');
+nn_output = myTDL_NN_Function(xs,xis);
 
 % Postprocess output of Neuronal Network
 run('Postprocess_NN.m');
