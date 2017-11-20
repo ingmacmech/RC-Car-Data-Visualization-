@@ -17,15 +17,13 @@ load(trainDataName);
 % Column 10: Gyroscope z-Axis
 % Column 11: Vehicle acceleration
 
-columns = [11 5 7]; % Set witch columns to use
+columns = [11 5 6 7]; % Set witch columns to use
 %columns = 1:11
 inputSize = size(columns,2);
 
 
 %% Set together a new input matrix
 
-
-%% Set output matrix
 output = nn_output;
 if (nnLearning == false)
     switch(nnType)

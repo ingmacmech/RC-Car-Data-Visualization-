@@ -11,16 +11,16 @@ savePCA = false;
 namePCA = 'nn_data.mat';
 
 saveNN = true;
-nameNN = 'nn_Test_1.mat';
+nameNN = 'nn_Test_2.mat';
 
 nColumns = 15;              % The number of columns in the data file + 1
 
 %% Plot Controlls
 orginalOverlay = false;
 
-plotTimeData        = true;
+plotTimeData        = false;
 plotPotiData        = false;
-plotPitchAngle      = true;
+plotPitchAngle      = false;
 plotSpeedData       = true;
 plotGforceScatter   = false;
 plotControllAccData = false;
@@ -42,7 +42,7 @@ load('cal');
 dataType = {'.txt'};
 
 % dataSet_1: Includes only data with slope = 0 and weight 0g and 900g
-load('dataSet_Test.mat');
+load('dataSet_Train_2.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot
@@ -519,7 +519,7 @@ if(saveNN == true)
             if (flagMatrix(n,m) == true)
                 % Put different datasets togeter
                 if(firstEnteringFlag == true)
-                    nn_input = [data.raw.(dataName{n,m})(1:end-1,2:11),...
+                    nn_input = [data.ing.(dataName{n,m})(1:end-1,2:11),...
                                    data.acc.(dataName{n,m})];
                     nn_output = data.pitch.poti.HF.(dataName{n,m})(1:end-1,1);
                     
@@ -534,7 +534,7 @@ if(saveNN == true)
                     firstEnteringFlag = false;
                 else
                     nn_input = [nn_input;...
-                                    data.raw.(dataName{n,m})(1:end-1,2:11),...
+                                    data.ing.(dataName{n,m})(1:end-1,2:11),...
                                     data.acc.(dataName{n,m})];
                     nn_output = [nn_output; data.pitch.poti.HF.(dataName{n,m})(1:end-1,1)];
                     

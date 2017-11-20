@@ -15,7 +15,7 @@ nnLearning = true;
 
 
 
-trainDataName = 'nn_Test_1.mat';
+trainDataName = 'nn_Test_2.mat';
 
 %Preprocess Neuronal Network
 run('Preprocessing_NN.m');
