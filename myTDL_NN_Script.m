@@ -15,11 +15,11 @@ T = tonndata(output,false,false);
 % 'trainlm' is usually fastest.
 % 'trainbr' takes longer but may be better for challenging problems.
 % 'trainscg' uses less memory. Suitable in low memory situations.
-trainFcn = 'trainlm';  % Levenberg-Marquardt backpropagation.
+trainFcn = 'trainscg';  % Levenberg-Marquardt backpropagation.
 
 % Create a Time Delay Network
-inputDelays = 1:40;
-hiddenLayerSize = 150;
+inputDelays = 1:120;
+hiddenLayerSize = 3000;
 net = timedelaynet(inputDelays,hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
@@ -111,10 +111,10 @@ end
 if (true)
     % Generate a matrix-only MATLAB function for neural network code
     % generation with MATLAB Coder tools.
-    genFunction(net,'myTDL_NN_Function_1','MatrixOnly','yes');
-    %x1 = cell2mat(x(1,:));
-    %xi1 = cell2mat(xi(1,:));
-    %y = myNeuralNetworkFunction_1(x1,xi1);
+    genFunction(net,'myTDL_Function_4','MatrixOnly','yes');
+    x1 = cell2mat(x(1,:));
+    xi1 = cell2mat(xi(1,:));
+    nn_output = myTDL_Function_4(x1,xi1);
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.
