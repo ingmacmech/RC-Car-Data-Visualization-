@@ -2,7 +2,9 @@
 
 %% Load Data
 
-load(trainDataName);
+trainData = load(trainDataName);
+testData = load(testDataName);
+valiData = load(valiDataName);
 
 %% Choose witch sensordata to use as input
 % Column 1: Throttle
@@ -24,15 +26,27 @@ inputSize = size(columns,2);
 
 %% Set together a new input matrix
 
-output = nn_output;
-input = zeros(size(nn_input,1),inputSize);
+
     for n = 1:inputSize
-        input(:,n) = nn_input(:,n);
+        tempTrainInput(:,n) = trainData.nn_input(:,n);
+        tempTestInput(:,n) = testData.nn_input(:,n);
+        tempValiInput(:,n) = testData.nn_input(:,n);
     end
-%% Set load label
-loadLabel = nn_loadLabel;
-%% Set slope label
-slopeLabel = nn_slopeLabel;
+input = [tempTrainInput;
+         tempTestInput;
+         tempValiInput];
+
+a = size(tempTrainInput,1);
+b = size(tempTestInput,1);
+c = size(tempValiInput,1);
+
+trainInd = 1:a;
+testInd = a+1:a+b;
+valiInd = a+b+1:a+b+c;
+    
+output = [trainData.nn_output;
+          testData.nn_output;
+          valiData.nn_output];
 
 
 clear nn_input nn_output nn_loadLabel nn_slopeLabel

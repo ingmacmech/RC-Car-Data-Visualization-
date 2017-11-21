@@ -46,35 +46,121 @@ clear dataName loadMatrix
 
 %% Train data for NN
 
-dataName = {'Test51_0g_TiefGarageLuzern_1','Test50_200g_TiefGarageLuzern_1','Test49_400g_TiefGarageLuzern_1','Test48_600g_TiefGarageLuzern_1','Test46_800g_TiefGarageLuzern_1','Test47_1000g_TiefGarageLuzern_1';
-            'Test51_0g_TiefGarageLuzern_2','Test50_200g_TiefGarageLuzern_2','Test49_400g_TiefGarageLuzern_2','Test48_600g_TiefGarageLuzern_2','Test46_800g_TiefGarageLuzern_2','Test47_1000g_TiefGarageLuzern_2';
-            'Test51_0g_TiefGarageLuzern_3','Test50_200g_TiefGarageLuzern_3','Test49_400g_TiefGarageLuzern_3','Test48_600g_TiefGarageLuzern_3','Test46_800g_TiefGarageLuzern_3','Test47_1000g_TiefGarageLuzern_3';
-            'Test51_0g_TiefGarageLuzern_4','Test50_200g_TiefGarageLuzern_4','Test49_400g_TiefGarageLuzern_4','Test48_600g_TiefGarageLuzern_4','Test46_800g_TiefGarageLuzern_4','Test47_1000g_TiefGarageLuzern_4';
-            'Test51_0g_TiefGarageLuzern_5','Test50_200g_TiefGarageLuzern_5','Test49_400g_TiefGarageLuzern_5','Test48_600g_TiefGarageLuzern_5','Test46_800g_TiefGarageLuzern_5','Test47_1000g_TiefGarageLuzern_5';
-            'Test51_0g_TiefGarageLuzern_6','Test50_200g_TiefGarageLuzern_6','Test49_400g_TiefGarageLuzern_6','Test48_600g_TiefGarageLuzern_6','Test46_800g_TiefGarageLuzern_6','Test47_1000g_TiefGarageLuzern_6'
+dataName = {'Test51_0g_TiefGarageLuzern_1';
+            'Test51_0g_TiefGarageLuzern_2';
+            'Test51_0g_TiefGarageLuzern_3';
+            'Test51_0g_TiefGarageLuzern_4';
+            'Test51_0g_TiefGarageLuzern_5';
+            'Test51_0g_TiefGarageLuzern_6';
+            'Test50_200g_TiefGarageLuzern_1';
+            'Test50_200g_TiefGarageLuzern_2';
+            'Test50_200g_TiefGarageLuzern_3';
+            'Test50_200g_TiefGarageLuzern_4';
+            'Test50_200g_TiefGarageLuzern_5';
+            'Test50_200g_TiefGarageLuzern_6';
+            'Test49_400g_TiefGarageLuzern_1';
+            'Test49_400g_TiefGarageLuzern_2';
+            'Test49_400g_TiefGarageLuzern_3';
+            'Test49_400g_TiefGarageLuzern_4';
+            'Test49_400g_TiefGarageLuzern_5';
+            'Test49_400g_TiefGarageLuzern_6';
+            'Test48_600g_TiefGarageLuzern_1';
+            'Test48_600g_TiefGarageLuzern_2';
+            'Test48_600g_TiefGarageLuzern_3';
+            'Test48_600g_TiefGarageLuzern_4';
+            'Test48_600g_TiefGarageLuzern_5';
+            'Test48_600g_TiefGarageLuzern_6';
+            'Test46_800g_TiefGarageLuzern_1';
+            'Test46_800g_TiefGarageLuzern_2';
+            'Test46_800g_TiefGarageLuzern_3';
+            'Test46_800g_TiefGarageLuzern_4';
+            'Test46_800g_TiefGarageLuzern_5';
+            'Test46_800g_TiefGarageLuzern_6';
+            'Test47_1000g_TiefGarageLuzern_1';
+            'Test47_1000g_TiefGarageLuzern_2';
+            'Test47_1000g_TiefGarageLuzern_3';
+            'Test47_1000g_TiefGarageLuzern_4';
+            'Test47_1000g_TiefGarageLuzern_5';
+            'Test47_1000g_TiefGarageLuzern_6'
             };
         
-loadMatrix = [ 0 200 400 600 800 1000;
-               0 200 400 600 800 1000;
-               0 200 400 600 800 1000;
-               0 200 400 600 800 1000;
-               0 200 400 600 800 1000;
-               0 200 400 600 800 1000
+loadMatrix = [ 0;
+               0;
+               0;
+               0;
+               0;
+               0;
+               200;
+               200;
+               200;
+               200;
+               200;
+               200;
+               400;
+               400;
+               400;
+               400;
+               400;
+               400;
+               600;
+               600;
+               600;
+               600;
+               600;
+               600;
+               800;
+               800;
+               800;
+               800;
+               800;
+               800;
+               1000;
+               1000;
+               1000;
+               1000;
+               1000;
+               1000
                ];
    
-slopeMatrix = [0 0 0 0 0 0;
-               0 0 0 0 0 0; 
-               0 0 0 0 0 0;
-               0 0 0 0 0 0;
-               0 0 0 0 0 0;
-               0 0 0 0 0 0; 
-               0 0 0 0 0 0;
-               0 0 0 0 0 0;
-               0 0 0 0 0 0; 
-               0 0 0 0 0 0;
-               0 0 0 0 0 0];
+slopeMatrix = [0;
+               0;  
+               0; 
+               0; 
+               0; 
+               0;
+               0;
+               0;  
+               0; 
+               0; 
+               0; 
+               0;
+               0;
+               0;  
+               0; 
+               0; 
+               0; 
+               0;
+               0;
+               0;  
+               0; 
+               0; 
+               0; 
+               0;
+               0;
+               0;  
+               0; 
+               0; 
+               0; 
+               0;
+               0;
+               0;  
+               0; 
+               0; 
+               0; 
+               0;
+               ];
                 
-save('dataSet_Train.mat','dataName','loadMatrix','slopeMatrix');
+save('dataSet_Train_1.mat','dataName','loadMatrix','slopeMatrix');
 clear dataName loadMatrix
 
 %% Train data for NN
@@ -107,21 +193,62 @@ clear dataName loadMatrix
 
 %% Test data for NN
 
-dataName = {'Test51_0g_TiefGarageLuzern_7','Test50_200g_TiefGarageLuzern_7','Test49_400g_TiefGarageLuzern_7','Test48_600g_TiefGarageLuzern_7','Test46_800g_TiefGarageLuzern_7','Test47_1000g_TiefGarageLuzern_7';
-            'Test51_0g_TiefGarageLuzern_8','Test50_200g_TiefGarageLuzern_8','Test49_400g_TiefGarageLuzern_8','Test48_600g_TiefGarageLuzern_8','Test46_800g_TiefGarageLuzern_8','Test47_1000g_TiefGarageLuzern_8'
-            
+dataName = {'Test51_0g_TiefGarageLuzern_7';
+            'Test50_200g_TiefGarageLuzern_7';
+            'Test49_400g_TiefGarageLuzern_7';
+            'Test48_600g_TiefGarageLuzern_7';
+            'Test46_800g_TiefGarageLuzern_7';
+            'Test47_1000g_TiefGarageLuzern_7'
             };
-        
-loadMatrix = [ 0 200 400 600 800 1000;
-               0 200 400 600 800 1000
+       
+loadMatrix = [ 0;
+               200;
+               400;
+               600;
+               800;
+               1000
                ];
    
-slopeMatrix = [0 0 0 0 0 0;
-               0 0 0 0 0 0 
+slopeMatrix = [0;
+               0;
+               0;
+               0;
+               0;
+               0 
                ];
                 
-save('dataSet_Test.mat','dataName','loadMatrix','slopeMatrix');
+save('dataSet_Test_1.mat','dataName','loadMatrix','slopeMatrix');
 clear dataName loadMatrix
+
+%% Validation data for NN
+
+dataName = {'Test51_0g_TiefGarageLuzern_8';
+            'Test50_200g_TiefGarageLuzern_8';
+            'Test49_400g_TiefGarageLuzern_8';
+            'Test48_600g_TiefGarageLuzern_8';
+            'Test46_800g_TiefGarageLuzern_8';
+            'Test47_1000g_TiefGarageLuzern_8'
+            };
+       
+loadMatrix = [ 0;
+               200;
+               400;
+               600;
+               800;
+               1000
+               ];
+   
+slopeMatrix = [0;
+               0;
+               0;
+               0;
+               0;
+               0 
+               ];
+                
+save('dataSet_Vali_1.mat','dataName','loadMatrix','slopeMatrix');
+clear dataName loadMatrix
+
 
 %% Laax data set with potis
 

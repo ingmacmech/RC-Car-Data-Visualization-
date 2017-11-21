@@ -5,7 +5,9 @@ clc
 
 %% Controlls
 
-trainDataName = 'nn_Test_1.mat';
+trainDataName = 'nn_Train_1.mat';
+testDataName = 'nn_Test_1.mat';
+valiDataName = 'nn_Vali_1.mat';
 
 %Preprocess Neuronal Network
 run('Preprocessing_NN.m');

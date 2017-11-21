@@ -15,11 +15,11 @@ T = tonndata(output,false,false);
 % 'trainlm' is usually fastest.
 % 'trainbr' takes longer but may be better for challenging problems.
 % 'trainscg' uses less memory. Suitable in low memory situations.
-trainFcn = 'trainscg';  % Levenberg-Marquardt backpropagation.
+trainFcn = 'trainbr';  
 
 % Create a Time Delay Network
-inputDelays = 1:120;
-hiddenLayerSize = 3000;
+inputDelays = 1:40;
+hiddenLayerSize = 100;
 net = timedelaynet(inputDelays,hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
@@ -37,11 +37,11 @@ net = timedelaynet(inputDelays,hiddenLayerSize,trainFcn);
 
 % Setup Division of Data for Training, Validation, Testing
 % For a list of all data division functions type: help nndivide
-net.divideFcn = 'dividerand';  % Divide data randomly
+net.divideFcn = 'divideind';  % Divide data randomly
 net.divideMode = 'time';  % Divide up every sample
-net.divideParam.trainRatio = 70/100;
-net.divideParam.valRatio = 15/100;
-net.divideParam.testRatio = 15/100;
+net.divideParam.trainRatio = trainInd;
+net.divideParam.valRatio = valInd;
+net.divideParam.testRatio = testInd;
 
 % Choose a Performance Function
 % For a list of all performance functions type: help nnperformance
@@ -111,10 +111,10 @@ end
 if (true)
     % Generate a matrix-only MATLAB function for neural network code
     % generation with MATLAB Coder tools.
-    genFunction(net,'myTDL_Function_4','MatrixOnly','yes');
+    genFunction(net,'myTDL_Function_5','MatrixOnly','yes');
     x1 = cell2mat(x(1,:));
     xi1 = cell2mat(xi(1,:));
-    nn_output = myTDL_Function_4(x1,xi1);
+    nn_output = myTDL_Function_5(x1,xi1);
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.
