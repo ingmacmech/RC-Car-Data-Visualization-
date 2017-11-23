@@ -7,7 +7,7 @@ clc;
 dataVanON = load('Noise_Van_ON.txt');
 dataVanOFF = load('Noise_Van_OFF.txt');
 load('nn_Test_1.mat');
-
+load('test.mat');
 accDataON = dataVanON(:,5:7) * 1/16384;
 gyroDataON = dataVanON(:,8:10) * 1/65.5;
 
@@ -17,11 +17,13 @@ gyroDataOFF = dataVanOFF(:,8:10) * 1/65.5;
 
 
 
+
 ingDataON = [accDataON, gyroDataON];
 ingDataOFF = [accDataOFF, gyroDataOFF];
 
 fHp = HighPassFilter();
 fLp = LowPassFilter();
+filter_ax = axFilter();
 
 filteredDataON = filter(fHp,ingDataON,1);
 %filteredDataON = filter(fLp,filteredDataON);
@@ -31,6 +33,14 @@ filteredDataOFF = filter(fHp,ingDataOFF,1);
 
 filteredInput = filter(fHp,nn_input,1);
 filteredOutput = filter(fHp,nn_output,1);
+
+filtered_ax = filter(fHp,ax);
+%filtered_ax = filter(fLp,filtered_ax);
+
+filtered_axSensor = filter(fHp,ax_sensor);
+ax_sensorFilt = filter(filter_ax,ax_sensor);
+
+
 
 clear accDataON gyroDataON accDataOFF gyroDataOFF
 
@@ -45,41 +55,56 @@ L_OFF = size(filteredDataOFF,1);
 L_Input = size(filteredInput,1);
 L_Output = size(filteredOutput,1);
 
+L_ax = size(filtered_ax,1);
+
 windowON = 1;%window(@kaiser,L_ON,0.1);
 windowOFF = 1;%window(@kaiser,L_OFF,0.1);
 windowInput = 1;
 windowOutput = 1;
 
+
 f_ON = Fs*(0:(L_ON/2))/L_ON;
 f_OFF = Fs*(0:(L_OFF/2))/L_OFF;
 f_Input = Fs*(0:(L_Input/2))/L_Input;
 f_Output = Fs*(0:(L_Output/2))/L_Output;
+f_ax = Fs*(0:(L_ax/2))/L_ax;
 
 t_ON = (0:L_ON-1)*T;
 t_OFF = (0:L_OFF-1)*T;
 t_Input = (0:L_Input-1)*T;
 t_Output = (0:L_Output-1)*T;
+t_ax = (0:L_ax-1)*T;
 
 fftVanON = fft(filteredDataON.*windowON,[],1);
 fftVanOFF = fft(filteredDataOFF.*windowOFF,[],1);
 fftInput = fft(filteredInput.*windowInput,[],1);
 fftOutput = fft(filteredOutput.*windowOutput,[],1);
 
+fftax = fft(filtered_ax,[],1);
+fftax_sensor = fft(filtered_axSensor,[],1);
+
 P2_ON = abs(fftVanON/L_ON);
 P2_OFF = abs(fftVanOFF/L_OFF);
 P2_Input = abs(fftInput/L_Input);
 P2_Output = abs(fftOutput/L_Output);
 
+P2_ax = abs(fftax/L_ax);
+P2_axSensor = abs(fftax_sensor/L_ax);
+
 P1_ON = P2_ON(1:L_ON/2+1,:);
 P1_OFF = P2_OFF(1:L_OFF/2+1,:);
 P1_Input = P2_Input(1:L_Input/2+1,:);
 P1_Output = P2_Output(1:L_Output/2+1,:);
+P1_ax = P2_ax(1:L_ax/2+1,:);
+P1_axSensor = P2_axSensor(1:L_ax/2+1,:);
+
 
 P1_ON(2:end-1,:) = 2*P1_ON(2:end-1,:);
 P1_OFF(2:end-1,:) = 2*P1_OFF(2:end-1,:);
 P1_Input(2:end-1,:) = 2*P1_Input(2:end-1,:);
 P1_Output(2:end-1,:) = 2*P1_Output(2:end-1,:);
-
+P1_ax(2:end-1,:) = 2*P1_ax(2:end-1,:);
+P1_axSensor(2:end-1,:) = 2*P1_axSensor(2:end-1,:);
 
 %% PLot Comparrison between unfiltered data acc data  van on and off
 figure()
@@ -437,3 +462,38 @@ hold off
 title('Gyroscope z-Axis')
 xlabel('f (Hz)')
 ylabel('|P1(f)|')
+
+%% Plot spectrum ax and ax Sensor
+figure()
+annotation('textbox', [0 0.9 1 0.1], ...
+            'String',...
+            'Single-Sided Amplitude Spectrum ',...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center',...
+            'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+
+subplot(3,1,1)
+hold on
+plot(t_ax,ax_sensor)
+plot(t_ax,ax)
+hold off
+        
+        
+        
+subplot(3,1,2)
+hold on
+plot(f_ax,P1_axSensor)
+plot(f_ax,P1_ax)
+
+hold off
+
+title('')
+xlabel('f (Hz)')
+ylabel('|P1(f)|')
+
+subplot(3,1,3)
+hold on
+plot(t_ax,ax_sensorFilt)
+plot(t_ax,ax)
+hold off
+
