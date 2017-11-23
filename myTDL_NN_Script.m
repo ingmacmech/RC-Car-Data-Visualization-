@@ -39,9 +39,9 @@ net = timedelaynet(inputDelays,hiddenLayerSize,trainFcn);
 % For a list of all data division functions type: help nndivide
 net.divideFcn = 'divideind';  % Divide data randomly
 net.divideMode = 'time';  % Divide up every sample
-net.divideParam.trainRatio = trainInd;
-net.divideParam.valRatio = valInd;
-net.divideParam.testRatio = testInd;
+net.divideParam.trainInd = trainInd_;
+net.divideParam.valInd = valiInd_;
+net.divideParam.testInd = testInd_;
 
 % Choose a Performance Function
 % For a list of all performance functions type: help nnperformance
@@ -111,10 +111,10 @@ end
 if (true)
     % Generate a matrix-only MATLAB function for neural network code
     % generation with MATLAB Coder tools.
-    genFunction(net,'myTDL_Function_5','MatrixOnly','yes');
+    genFunction(net,'myTDL_Function_6','MatrixOnly','yes');
     x1 = cell2mat(x(1,:));
     xi1 = cell2mat(xi(1,:));
-    nn_output = myTDL_Function_5(x1,xi1);
+    nn_output = myTDL_Function_6(x1,xi1);
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.

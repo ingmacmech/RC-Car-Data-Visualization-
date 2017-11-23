@@ -30,7 +30,7 @@ inputSize = size(columns,2);
     for n = 1:inputSize
         tempTrainInput(:,n) = trainData.nn_input(:,n);
         tempTestInput(:,n) = testData.nn_input(:,n);
-        tempValiInput(:,n) = testData.nn_input(:,n);
+        tempValiInput(:,n) = valiData.nn_input(:,n);
     end
 input = [tempTrainInput;
          tempTestInput;
@@ -40,9 +40,9 @@ a = size(tempTrainInput,1);
 b = size(tempTestInput,1);
 c = size(tempValiInput,1);
 
-trainInd = 1:a;
-testInd = a+1:a+b;
-valiInd = a+b+1:a+b+c;
+trainInd_ = 1:a;
+testInd_ = a+1:a+b;
+valiInd_ = a+b+1:a+b+c;
     
 output = [trainData.nn_output;
           testData.nn_output;
