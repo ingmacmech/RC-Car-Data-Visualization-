@@ -10,7 +10,7 @@ close all;
 savePCA = false;
 namePCA = 'nn_data.mat';
 
-saveNN = true;
+saveNN = false;
 nameNN = 'nn_Vali_1.mat';
 
 nColumns = 15;              % The number of columns in the data file + 1
@@ -18,7 +18,7 @@ nColumns = 15;              % The number of columns in the data file + 1
 %% Plot Controlls
 orginalOverlay = false;
 
-plotTimeData        = false;
+plotTimeData        = true;
 plotPotiData        = false;
 plotPitchAngle      = false;
 plotSpeedData       = false;

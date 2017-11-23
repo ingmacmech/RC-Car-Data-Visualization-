@@ -19,18 +19,16 @@ valiData = load(valiDataName);
 % Column 10: Gyroscope z-Axis
 % Column 11: Vehicle acceleration
 
-columns = [11 5 6 7]; % Set witch columns to use
+columns = [11 5 7]; % Set witch columns to use
 %columns = 1:11
 inputSize = size(columns,2);
 
 
 %% Set together a new input matrix
-
-
     for n = 1:inputSize
-        tempTrainInput(:,n) = trainData.nn_input(:,n);
-        tempTestInput(:,n) = testData.nn_input(:,n);
-        tempValiInput(:,n) = valiData.nn_input(:,n);
+        tempTrainInput(:,n) = trainData.nn_input(:,columns(n));
+        tempTestInput(:,n) = testData.nn_input(:,columns(n));
+        tempValiInput(:,n) = valiData.nn_input(:,columns(n));
     end
 input = [tempTrainInput;
          tempTestInput;
@@ -48,6 +46,14 @@ output = [trainData.nn_output;
           testData.nn_output;
           valiData.nn_output];
 
+aFilter = axFilter();
 
-clear nn_input nn_output nn_loadLabel nn_slopeLabel
+tempFilter = filter(aFilter,input(:,2));
+input(:,2) = tempFilter;
+clear tempFilter
+
+tempFilter = filter(aFilter,input(:,3));
+input(:,3) = tempFilter;
+
+clear nn_input nn_output nn_loadLabel nn_slopeLabel tempFilter
 
