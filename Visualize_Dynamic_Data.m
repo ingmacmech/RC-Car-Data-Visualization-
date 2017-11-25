@@ -10,7 +10,7 @@ close all;
 savePCA = false;
 namePCA = 'nn_data.mat';
 
-saveNN = false;
+saveNN = true;
 nameNN = 'nn_Vali_1.mat';
 
 nColumns = 15;              % The number of columns in the data file + 1
@@ -18,7 +18,7 @@ nColumns = 15;              % The number of columns in the data file + 1
 %% Plot Controlls
 orginalOverlay = false;
 
-plotTimeData        = true;
+plotTimeData        = false;
 plotPotiData        = false;
 plotPitchAngle      = false;
 plotSpeedData       = false;
@@ -513,10 +513,12 @@ end
 
 %% Prepare data for Neuronal Network
 firstEnteringFlag = true;
+nSamples = 0;
 if(saveNN == true)
     for n = 1 : nFiles
         for m = 1 : mFiles
             if (flagMatrix(n,m) == true)
+                nSamples = nSamples + size(data.ing.(dataName{n,m}),1)-1;
                 % Put different datasets togeter
                 if(firstEnteringFlag == true)
                     nn_input = [data.ing.(dataName{n,m})(1:end-1,2:11),...
@@ -531,6 +533,10 @@ if(saveNN == true)
                     size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)*...
                     slopeMatrix(n,m);
                     
+                    name = {dataName{n,m}};
+                    
+                    indiz = [1,nSamples]; 
+                
                     firstEnteringFlag = false;
                 else
                     nn_input = [nn_input;...
@@ -545,11 +551,23 @@ if(saveNN == true)
                     nn_slopeLabel = [nn_slopeLabel;
                         ones(size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)*...
                              slopeMatrix(n,m)];
+                         
+                    name = [name;dataName{n,m}];
+                    
+                    indiz = [indiz; [indiz(size(indiz,1),2)+1,nSamples] ];
                 end
             end
         end
     end
-    save(nameNN,'nn_input','nn_output','nn_loadLabel','nn_slopeLabel')
+    nnData.Input = nn_input;
+    nnData.Output = nn_output;
+    nnData.StartStop = indiz;
+    nnData.Load = nn_loadLabel;
+    nnData.Slope = nn_slopeLabel;
+    nnData.Name = name;
+    clear nn_input nn_output nn_loadLabel nn_slopeLabel name indiz
+    
+    save(nameNN,'-struct','nnData')
 end
 clear firstEnteringFlag;
 

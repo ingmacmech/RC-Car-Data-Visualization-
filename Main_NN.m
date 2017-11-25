@@ -14,7 +14,7 @@ run('Preprocessing_NN.m');
 
 % Neuronal network learning
 
-run('myTDL_NN_Script.m');
+run('myNN_Script.m');
 
 
 

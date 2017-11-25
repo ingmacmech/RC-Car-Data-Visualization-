@@ -277,3 +277,17 @@ slopeMatrix = [10.7 10.7;
                 
 save('dataSet_LaaxPoti.mat','dataName','loadMatrix','slopeMatrix');
 clear dataName loadMatrix slopeMatrix
+
+
+%% Laax data set with potis
+
+dataName = {'Test51_0g_TiefGarageLuzern_1';
+            'Test50_200g_TiefGarageLuzern_1'
+            };
+        
+loadMatrix = [ 0;200];
+           
+slopeMatrix = [0;2];
+                
+save('dataSet_Test.mat','dataName','loadMatrix','slopeMatrix');
+clear dataName loadMatrix slopeMatrix

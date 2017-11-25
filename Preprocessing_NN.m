@@ -26,9 +26,9 @@ inputSize = size(columns,2);
 
 %% Set together a new input matrix
     for n = 1:inputSize
-        tempTrainInput(:,n) = trainData.nn_input(:,columns(n));
-        tempTestInput(:,n) = testData.nn_input(:,columns(n));
-        tempValiInput(:,n) = valiData.nn_input(:,columns(n));
+        tempTrainInput(:,n) = trainData.Input(:,columns(n));
+        tempTestInput(:,n) = testData.Input(:,columns(n));
+        tempValiInput(:,n) = valiData.Input(:,columns(n));
     end
 input = [tempTrainInput;
          tempTestInput;
@@ -42,9 +42,9 @@ trainInd_ = 1:a;
 testInd_ = a+1:a+b;
 valiInd_ = a+b+1:a+b+c;
     
-output = [trainData.nn_output;
-          testData.nn_output;
-          valiData.nn_output];
+output = [trainData.Output;
+          testData.Output;
+          valiData.Output];
 
 aFilter = axFilter();
 
@@ -56,4 +56,7 @@ tempFilter = filter(aFilter,input(:,3));
 input(:,3) = tempFilter;
 
 clear nn_input nn_output nn_loadLabel nn_slopeLabel tempFilter
+
+[input_features,output_features] = featureExtraction(input,output,40,true);
+
 
