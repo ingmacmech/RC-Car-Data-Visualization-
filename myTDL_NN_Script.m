@@ -19,7 +19,7 @@ trainFcn = 'trainscg';
 
 % Create a Time Delay Network
 inputDelays = 1:120;
-hiddenLayerSize = 3000;
+hiddenLayerSize = 5000;
 net = timedelaynet(inputDelays,hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
