@@ -26,6 +26,9 @@ inputSize = size(columns,2);
 %% Limit for acceleration data
 lim = 0.3;
 
+%% cut away filter response in data
+cut = 40;
+
 
 %% get new vectors for input and output
 for n = 1:inputSize
@@ -51,15 +54,23 @@ for n = 1:size(trainData.StartStop,1)
     limitData(tempTrainInput(start:stop,:),...
               tempTrainOutput(start:stop,:),lim);
           
-    nSamples = nSamples + newLength;
+    nSamples = nSamples + newLength-2*cut;
           
     if n == 1
-    	tempFeatIn = filter(LP,in,1);
-        tempFeatOut = filter(LP,out,1);
+        tempFilter = filter(LP,in,1);
+    	tempFeatIn = tempFilter(cut:end-cut,:);
+        
+        tempFilter = filter(LP,out,1);
+        tempFeatOut = tempFilter(cut:end-cut,:);
+        
         tempStartStop = [1,nSamples];
     else
-        tempFeatIn = [tempFeatIn ; filter(LP,in,1)];
-        tempFeatOut = [tempFeatOut ; filter(LP,out,1)];
+        tempFilter = filter(LP,in,1)
+        tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
+        
+        tempFilter = filter(LP,out,1);
+        tempFeatOut = [tempFeatOut ; tempFilter(cut:end-cut,:)];
+        
         tempStartStop = [tempStartStop;...
                       [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
     end
@@ -69,7 +80,7 @@ trainData.InputFeautures = tempFeatIn;
 trainData.OutputFeautures = tempFeatOut;
 trainData.StartStopFeautres = tempStartStop;
 
-clear tempFeatIn tempFeatOut tempStartStop in out newLength
+clear tempFeatIn tempFeatOut tempStartStop in out newLength tempFilter
 
 % Test-Data
 nSamples = 0;
@@ -82,15 +93,23 @@ for n = 1:size(testData.StartStop,1)
     limitData(tempTestInput(start:stop,:),...
               tempTestOutput(start:stop,:),lim);
           
-    nSamples = nSamples + newLength;
+    nSamples = nSamples + newLength-2*cut;
           
     if n == 1
-    	tempFeatIn = filter(LP,in,1);
-        tempFeatOut = filter(LP,out,1);
+        tempFilter = filter(LP,in,1);
+    	tempFeatIn = tempFilter(cut:end-cut,:);
+        
+        tempFilter = filter(LP,out,1);
+        tempFeatOut = tempFilter(cut:end-cut,:);
+        
         tempStartStop = [1,nSamples];
     else
-        tempFeatIn = [tempFeatIn ; filter(LP,in,1)];
-        tempFeatOut = [tempFeatOut ; filter(LP,out,1)];
+        tempFilter = filter(LP,in,1);
+        tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
+        
+        tempFilter = filter(LP,out,1);
+        tempFeatOut = [tempFeatOut ; tempFilter(cut:end-cut,:)];
+        
         tempStartStop = [tempStartStop;...
                       [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
     end
@@ -100,7 +119,7 @@ testData.InputFeautures = tempFeatIn;
 testData.OutputFeautures = tempFeatOut;
 testData.StartStopFeautres = tempStartStop;
 
-clear tempFeatIn tempFeatOut tempStartStop in out newLength
+clear tempFeatIn tempFeatOut tempStartStop in out newLength tempFilter
 
 % Validation-Data
 nSamples = 0;
@@ -113,15 +132,23 @@ for n = 1:size(valiData.StartStop,1)
     limitData(tempValiInput(start:stop,:),...
               tempValiOutput(start:stop,:),lim);
           
-    nSamples = nSamples + newLength;
+    nSamples = nSamples + newLength-2*cut;
           
     if n == 1
-    	tempFeatIn = filter(LP,in,1);
-        tempFeatOut = filter(LP,out,1);
+        tempFilter = filter(LP,in,1);
+    	tempFeatIn = tempFilter(cut:end-cut,:);
+        
+        tempFilter = filter(LP,out,1);
+        tempFeatOut = tempFilter(cut:end-cut,:);
+        
         tempStartStop = [1,nSamples];
     else
-        tempFeatIn = [tempFeatIn ; filter(LP,in,1)];
-        tempFeatOut = [tempFeatOut ; filter(LP,out,1)];
+        tempFilter = filter(LP,in,1);
+        tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
+        
+        tempFilter = filter(LP,out,1);
+        tempFeatOut = [tempFeatOut ; tempFilter(cut:end-cut,:)];
+        
         tempStartStop = [tempStartStop;...
                       [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
     end
@@ -131,7 +158,7 @@ valiData.InputFeautures = tempFeatIn;
 valiData.OutputFeautures = tempFeatOut;
 valiData.StartStopFeautres = tempStartStop;
 
-clear tempFeatIn tempFeatOut tempStartStop in out newLength
+clear tempFeatIn tempFeatOut tempStartStop in out newLength tempFilter
 
 %% Filter all data
 
