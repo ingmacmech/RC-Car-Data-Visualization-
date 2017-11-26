@@ -1,4 +1,4 @@
-function [ in, out ] = limitData( input, output, lim )
+function [ in, out, newLength ] = limitData( input, output, lim )
 %UNTITLED gives back only the data in a certain rainge set by lim
 %   Detailed explanation goes here
 
@@ -19,4 +19,4 @@ for n = 1 : nIn
     end
 end
 
-
+newLength = size(in,1);

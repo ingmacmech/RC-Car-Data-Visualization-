@@ -23,13 +23,118 @@ columns = [11 5 7]; % Set witch columns to use
 %columns = 1:11
 inputSize = size(columns,2);
 
+%% Limit for acceleration data
+lim = 0.3;
 
-%% Set together a new input matrix
-    for n = 1:inputSize
-        tempTrainInput(:,n) = trainData.Input(:,columns(n));
-        tempTestInput(:,n) = testData.Input(:,columns(n));
-        tempValiInput(:,n) = valiData.Input(:,columns(n));
+
+%% get new vectors for input and output
+for n = 1:inputSize
+    tempTrainInput(:,n) = trainData.Input(:,columns(n));
+    tempTestInput(:,n) = testData.Input(:,columns(n));
+    tempValiInput(:,n) = valiData.Input(:,columns(n));
+end
+    
+tempTrainOutput = trainData.Output; 
+tempTestOutput = testData.Output;
+tempValiOutput = valiData.Output;
+
+%% get only values for x-Axis and z-Axis in a certain range and filter it
+% Train-Data
+nSamples = 0;
+LP = axFilter();
+for n = 1:size(trainData.StartStop,1)
+    
+    start = trainData.StartStop(n,1);
+    stop = trainData.StartStop(n,2);
+    
+    [in,out,newLength] =... 
+    limitData(tempTrainInput(start:stop,:),...
+              tempTrainOutput(start:stop,:),lim);
+          
+    nSamples = nSamples + newLength;
+          
+    if n == 1
+    	tempFeatIn = filter(LP,in,1);
+        tempFeatOut = filter(LP,out,1);
+        tempStartStop = [1,nSamples];
+    else
+        tempFeatIn = [tempFeatIn ; filter(LP,in,1)];
+        tempFeatOut = [tempFeatOut ; filter(LP,out,1)];
+        tempStartStop = [tempStartStop;...
+                      [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
     end
+end
+
+trainData.InputFeautures = tempFeatIn;
+trainData.OutputFeautures = tempFeatOut;
+trainData.StartStopFeautres = tempStartStop;
+
+clear tempFeatIn tempFeatOut tempStartStop in out newLength
+
+% Test-Data
+nSamples = 0;
+for n = 1:size(testData.StartStop,1)
+    
+    start = testData.StartStop(n,1);
+    stop = testData.StartStop(n,2);
+    
+    [in,out,newLength] =... 
+    limitData(tempTestInput(start:stop,:),...
+              tempTestOutput(start:stop,:),lim);
+          
+    nSamples = nSamples + newLength;
+          
+    if n == 1
+    	tempFeatIn = filter(LP,in,1);
+        tempFeatOut = filter(LP,out,1);
+        tempStartStop = [1,nSamples];
+    else
+        tempFeatIn = [tempFeatIn ; filter(LP,in,1)];
+        tempFeatOut = [tempFeatOut ; filter(LP,out,1)];
+        tempStartStop = [tempStartStop;...
+                      [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
+    end
+end
+
+testData.InputFeautures = tempFeatIn;
+testData.OutputFeautures = tempFeatOut;
+testData.StartStopFeautres = tempStartStop;
+
+clear tempFeatIn tempFeatOut tempStartStop in out newLength
+
+% Validation-Data
+nSamples = 0;
+for n = 1:size(valiData.StartStop,1)
+    
+    start = valiData.StartStop(n,1);
+    stop = valiData.StartStop(n,2);
+    
+    [in,out,newLength] =... 
+    limitData(tempValiInput(start:stop,:),...
+              tempValiOutput(start:stop,:),lim);
+          
+    nSamples = nSamples + newLength;
+          
+    if n == 1
+    	tempFeatIn = filter(LP,in,1);
+        tempFeatOut = filter(LP,out,1);
+        tempStartStop = [1,nSamples];
+    else
+        tempFeatIn = [tempFeatIn ; filter(LP,in,1)];
+        tempFeatOut = [tempFeatOut ; filter(LP,out,1)];
+        tempStartStop = [tempStartStop;...
+                      [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
+    end
+end
+
+valiData.InputFeautures = tempFeatIn;
+valiData.OutputFeautures = tempFeatOut;
+valiData.StartStopFeautres = tempStartStop;
+
+clear tempFeatIn tempFeatOut tempStartStop in out newLength
+
+%% Filter all data
+
 input = [tempTrainInput;
          tempTestInput;
          tempValiInput];
@@ -42,21 +147,14 @@ trainInd_ = 1:a;
 testInd_ = a+1:a+b;
 valiInd_ = a+b+1:a+b+c;
     
-output = [trainData.Output;
-          testData.Output;
-          valiData.Output];
+output = [tempTrainOutput;
+          tempTestOutput;
+          tempValiOutput];
 
-aFilter = axFilter();
 
-tempFilter = filter(aFilter,input(:,2));
-input(:,2) = tempFilter;
-clear tempFilter
-
-tempFilter = filter(aFilter,input(:,3));
-input(:,3) = tempFilter;
 
 clear nn_input nn_output nn_loadLabel nn_slopeLabel tempFilter
 
-[input_features,output_features] = featureExtraction(input,output,40,false);
+[input_features,output_features] = featureExtraction(input,output,40,true);
 
 
