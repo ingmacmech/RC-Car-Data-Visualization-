@@ -18,7 +18,7 @@ t = output_features';
 trainFcn = 'trainlm';  % Levenberg-Marquardt backpropagation.
 
 % Create a Fitting Network
-hiddenLayerSize = [100, 50];
+hiddenLayerSize = [100];
 net = fitnet(hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
@@ -64,10 +64,10 @@ view(net)
 
 % Plots
 % Uncomment these lines to enable various plots.
-%figure, plotperform(tr)
+figure, plotperform(tr)
 %figure, plottrainstate(tr)
 %figure, ploterrhist(e)
-%figure, plotregression(t,y)
+figure, plotregression(t,y)
 %figure, plotfit(net,x,t)
 
 % Deployment

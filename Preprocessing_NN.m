@@ -135,21 +135,21 @@ clear tempFeatIn tempFeatOut tempStartStop in out newLength
 
 %% Filter all data
 
-input = [tempTrainInput;
-         tempTestInput;
-         tempValiInput];
+input = [trainData.InputFeautures;
+         testData.InputFeautures;
+         valiData.InputFeautures];
 
-a = size(tempTrainInput,1);
-b = size(tempTestInput,1);
-c = size(tempValiInput,1);
+a = size(trainData.InputFeautures,1);
+b = size(testData.InputFeautures,1);
+c = size(valiData.InputFeautures,1);
 
 trainInd_ = 1:a;
 testInd_ = a+1:a+b;
 valiInd_ = a+b+1:a+b+c;
     
-output = [tempTrainOutput;
-          tempTestOutput;
-          tempValiOutput];
+output = [trainData.OutputFeautures;
+          testData.OutputFeautures;
+          valiData.OutputFeautures];
 
 
 
