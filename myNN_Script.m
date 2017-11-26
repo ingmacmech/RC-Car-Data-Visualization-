@@ -43,6 +43,9 @@ net.performFcn = 'mse';  % Mean Squared Error
 net.plotFcns = {'plotperform','plottrainstate','ploterrhist', ...
     'plotregression', 'plotfit'};
 
+%% set another output function
+net.layers{2}.transferFcn = 'tansig';
+
 % Train the Network
 [net,tr] = train(net,x,t,'useParallel','yes','showResources','yes');
 
@@ -85,7 +88,7 @@ if (true)
     % Generate a matrix-only MATLAB function for neural network code
     % generation with MATLAB Coder tools.
     genFunction(net,'myFF_Function_','MatrixOnly','yes');
-    nn_output = myFF_Function_(x);
+    nn_output = (myFF_Function_(x))';
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.

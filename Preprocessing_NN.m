@@ -24,11 +24,13 @@ columns = [11 5 7]; % Set witch columns to use
 inputSize = size(columns,2);
 
 %% Limit for acceleration data
-lim = 0.1;
+lim = 0.3;
 
 %% cut away filter response in data
-cut = 40;
+cut = 20;
 
+%% feautre extraktion window
+window = 80;
 
 %% get new vectors for input and output
 for n = 1:inputSize
@@ -53,24 +55,33 @@ for n = 1:size(trainData.StartStop,1)
     [in,out,newLength] =... 
     limitData(tempTrainInput(start:stop,:),...
               tempTrainOutput(start:stop,:),lim);
-          
-    nSamples = nSamples + newLength-2*cut;
-          
+    
     if n == 1
         tempFilter = filter(LP,in,1);
-    	tempFeatIn = tempFilter(cut:end-cut,:);
+    	tempFeatIn = tempFilter(cut:end-cut-1,:);
         
         tempFilter = filter(LP,out,1);
-        tempFeatOut = tempFilter(cut:end-cut,:);
+        tempFeatOut = tempFilter(cut:end-cut-1,:);
         
+        [tempFeatIn,tempFeatOut] =...
+        featureExtraction(tempFeatIn,tempFeatOut,window,false);
+        
+        nSamples = nSamples + size(tempFeatIn,1);
         tempStartStop = [1,nSamples];
     else
-        tempFilter = filter(LP,in,1);
-        tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
+        tempFilterIn = filter(LP,in,1);
+        tempFilterIn = tempFilterIn(cut:end-cut-1,:);
         
-        tempFilter = filter(LP,out,1);
-        tempFeatOut = [tempFeatOut ; tempFilter(cut:end-cut,:)];
+        tempFilterOut = filter(LP,out,1);
+        tempFilterOut = tempFilterOut(cut:end-cut-1,:);
         
+        [tempFilterIn,tempFilterOut] = ...
+        featureExtraction(tempFilterIn,tempFilterOut,window,false);    
+        
+        tempFeatIn = [tempFeatIn ; tempFilterIn];
+        tempFeatOut = [tempFeatOut ; tempFilterOut];
+        
+        nSamples = nSamples + size(tempFilterIn,1);
         tempStartStop = [tempStartStop;...
                       [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
     end
@@ -93,23 +104,32 @@ for n = 1:size(testData.StartStop,1)
     limitData(tempTestInput(start:stop,:),...
               tempTestOutput(start:stop,:),lim);
           
-    nSamples = nSamples + newLength-2*cut;
-          
     if n == 1
         tempFilter = filter(LP,in,1);
-    	tempFeatIn = tempFilter(cut:end-cut,:);
+    	tempFeatIn = tempFilter(cut:end-cut-1,:);
         
         tempFilter = filter(LP,out,1);
-        tempFeatOut = tempFilter(cut:end-cut,:);
+        tempFeatOut = tempFilter(cut:end-cut-1,:);
         
+        [tempFeatIn,tempFeatOut] =...
+        featureExtraction(tempFeatIn,tempFeatOut,window,false);
+        
+        nSamples = nSamples + size(tempFeatIn,1);
         tempStartStop = [1,nSamples];
     else
-        tempFilter = filter(LP,in,1);
-        tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
+        tempFilterIn = filter(LP,in,1);
+        tempFilterIn = tempFilterIn(cut:end-cut-1,:);
         
-        tempFilter = filter(LP,out,1);
-        tempFeatOut = [tempFeatOut ; tempFilter(cut:end-cut,:)];
+        tempFilterOut = filter(LP,out,1);
+        tempFilterOut = tempFilterOut(cut:end-cut-1,:);
         
+        [tempFilterIn,tempFilterOut] = ...
+        featureExtraction(tempFilterIn,tempFilterOut,window,false);    
+        
+        tempFeatIn = [tempFeatIn ; tempFilterIn];
+        tempFeatOut = [tempFeatOut ; tempFilterOut];
+        
+        nSamples = nSamples + size(tempFilterIn,1);
         tempStartStop = [tempStartStop;...
                       [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
     end
@@ -132,23 +152,32 @@ for n = 1:size(valiData.StartStop,1)
     limitData(tempValiInput(start:stop,:),...
               tempValiOutput(start:stop,:),lim);
           
-    nSamples = nSamples + newLength-2*cut;
-          
     if n == 1
         tempFilter = filter(LP,in,1);
-    	tempFeatIn = tempFilter(cut:end-cut,:);
+    	tempFeatIn = tempFilter(cut:end-cut-1,:);
         
         tempFilter = filter(LP,out,1);
-        tempFeatOut = tempFilter(cut:end-cut,:);
+        tempFeatOut = tempFilter(cut:end-cut-1,:);
         
+        [tempFeatIn,tempFeatOut] =...
+        featureExtraction(tempFeatIn,tempFeatOut,window,false);
+        
+        nSamples = nSamples + size(tempFeatIn,1);
         tempStartStop = [1,nSamples];
     else
-        tempFilter = filter(LP,in,1);
-        tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
+        tempFilterIn = filter(LP,in,1);
+        tempFilterIn = tempFilterIn(cut:end-cut-1,:);
         
-        tempFilter = filter(LP,out,1);
-        tempFeatOut = [tempFeatOut ; tempFilter(cut:end-cut,:)];
+        tempFilterOut = filter(LP,out,1);
+        tempFilterOut = tempFilterOut(cut:end-cut-1,:);
         
+        [tempFilterIn,tempFilterOut] = ...
+        featureExtraction(tempFilterIn,tempFilterOut,window,false);    
+        
+        tempFeatIn = [tempFeatIn ; tempFilterIn];
+        tempFeatOut = [tempFeatOut ; tempFilterOut];
+        
+        nSamples = nSamples + size(tempFilterIn,1);
         tempStartStop = [tempStartStop;...
                       [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
     end
@@ -162,9 +191,9 @@ clear tempFeatIn tempFeatOut tempStartStop in out newLength tempFilter
 
 %% Filter all data
 
-input = [trainData.InputFeautures;
-         testData.InputFeautures;
-         valiData.InputFeautures];
+input_features = [trainData.InputFeautures;
+                  testData.InputFeautures;
+                  valiData.InputFeautures];
 
 a = size(trainData.InputFeautures,1);
 b = size(testData.InputFeautures,1);
@@ -173,15 +202,19 @@ c = size(valiData.InputFeautures,1);
 trainInd_ = 1:a;
 testInd_ = a+1:a+b;
 valiInd_ = a+b+1:a+b+c;
-    
-output = [trainData.OutputFeautures;
-          testData.OutputFeautures;
-          valiData.OutputFeautures];
+
+trainData.Offset = 0;
+testData.Offset = a;
+valiData.Offset = a+b;
+
+output_features = [trainData.OutputFeautures;
+                   testData.OutputFeautures;
+                   valiData.OutputFeautures];
 
 
 
 clear nn_input nn_output nn_loadLabel nn_slopeLabel tempFilter
 
-[input_features,output_features] = featureExtraction(input,output,40,true);
+%[input_features,output_features] = featureExtraction(input,output,40,true);
 
 

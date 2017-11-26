@@ -85,7 +85,7 @@ if (true)
     % Generate a matrix-only MATLAB function for neural network code
     % generation with MATLAB Coder tools.
     genFunction(net,'myNeuralNetworkFunction_2','MatrixOnly','yes');
-    y = myNeuralNetworkFunction_2(x);
+    y = (myNeuralNetworkFunction_2(x))';
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.
