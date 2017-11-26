@@ -24,7 +24,7 @@ columns = [11 5 7]; % Set witch columns to use
 inputSize = size(columns,2);
 
 %% Limit for acceleration data
-lim = 0.3;
+lim = 0.1;
 
 %% cut away filter response in data
 cut = 40;
@@ -65,7 +65,7 @@ for n = 1:size(trainData.StartStop,1)
         
         tempStartStop = [1,nSamples];
     else
-        tempFilter = filter(LP,in,1)
+        tempFilter = filter(LP,in,1);
         tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
         
         tempFilter = filter(LP,out,1);
