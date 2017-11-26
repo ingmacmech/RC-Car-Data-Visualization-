@@ -65,7 +65,7 @@ for n = 1:size(trainData.StartStop,1)
         
         tempStartStop = [1,nSamples];
     else
-        tempFilter = filter(LP,in,1)
+        tempFilter = filter(LP,in,1);
         tempFeatIn = [tempFeatIn ; tempFilter(cut:end-cut,:)];
         
         tempFilter = filter(LP,out,1);
