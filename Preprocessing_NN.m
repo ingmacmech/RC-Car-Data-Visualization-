@@ -57,6 +57,6 @@ input(:,3) = tempFilter;
 
 clear nn_input nn_output nn_loadLabel nn_slopeLabel tempFilter
 
-[input_features,output_features] = featureExtraction(input,output,40,true);
+[input_features,output_features] = featureExtraction(input,output,40,false);
 
 
