@@ -227,7 +227,12 @@ dataName = {'Test51_0g_TiefGarageLuzern_8';
             'Test49_400g_TiefGarageLuzern_8';
             'Test48_600g_TiefGarageLuzern_8';
             'Test46_800g_TiefGarageLuzern_8';
-            'Test47_1000g_TiefGarageLuzern_8'
+            'Test47_1000g_TiefGarageLuzern_8';
+            'Test47_1000g_TiefGarageLuzern_9';
+            'Test48_600g_TiefGarageLuzern_9';
+            'Test49_400g_TiefGarageLuzern_9';
+            'Test50_200g_TiefGarageLuzern_9';
+            'Test51_0g_TiefGarageLuzern_9'
             };
        
 loadMatrix = [ 0;
@@ -235,7 +240,12 @@ loadMatrix = [ 0;
                400;
                600;
                800;
-               1000
+               1000;
+               1000;
+               600;
+               400;
+               200;
+               0
                ];
    
 slopeMatrix = [0;
@@ -243,7 +253,12 @@ slopeMatrix = [0;
                0;
                0;
                0;
-               0 
+               0;
+               0;
+               0;
+               0;
+               0;
+               0
                ];
                 
 save('dataSet_Vali_1.mat','dataName','loadMatrix','slopeMatrix');
@@ -291,3 +306,32 @@ slopeMatrix = [0;2];
                 
 save('dataSet_Test.mat','dataName','loadMatrix','slopeMatrix');
 clear dataName loadMatrix slopeMatrix
+
+%% Test data for NN
+
+dataName = {'Test26_0g_X_Steigung1_Dyn_1';
+            'Test27_0g_X_Steigung2_Dyn_1';
+            'Test28_0g_X_Steigung3_Dyn_1';
+            'Test29_900g_H_Steigung1_Dyn_1';
+            'Test30_900g_H_Steigung2_Dyn_1';
+            'Test31_900g_H_Steigung3_Dyn_1'
+            };
+       
+loadMatrix = [ 0;
+               0;
+               0;
+               900;
+               900;
+               900
+               ];
+   
+slopeMatrix = [1;
+               2;
+               3;
+               1;
+               2;
+               3 
+               ];
+                
+save('dataSet_Test_Laax.mat','dataName','loadMatrix','slopeMatrix');
+clear dataName loadMatrix

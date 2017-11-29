@@ -20,8 +20,8 @@ orginalOverlay = false;
 
 plotTimeData        = false;
 plotPotiData        = false;
-plotPitchAngle      = false;
-plotSpeedData       = false;
+plotPitchAngle      = true;
+plotSpeedData       = true;
 plotGforceScatter   = false;
 plotControllAccData = false;
 plotAccVsControl    = false;
@@ -525,13 +525,17 @@ if(saveNN == true)
                                    data.acc.(dataName{n,m})];
                     nn_output = data.pitch.poti.HF.(dataName{n,m})(1:end-1,1);
                     
-                    nn_loadLabel = ones(...
-                    size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)...
-                    * loadMatrix(n,m);
+                    nn_loadLabel = loadMatrix(n,m);
+                    
+%                     ones(...
+%                     size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)...
+%                     * loadMatrix(n,m);
                 
-                    nn_slopeLabel = ones(...
-                    size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)*...
-                    slopeMatrix(n,m);
+                    nn_slopeLabel = slopeMatrix(n,m);
+                    
+%                     ones(...
+%                     size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)*...
+%                     slopeMatrix(n,m);
                     
                     name = {dataName{n,m}};
                     
@@ -545,12 +549,10 @@ if(saveNN == true)
                     nn_output = [nn_output; data.pitch.poti.HF.(dataName{n,m})(1:end-1,1)];
                     
                     nn_loadLabel = [nn_loadLabel;...
-                        ones(size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)...
-                        * loadMatrix(n,m)];
+                                    loadMatrix(n,m)];
                     
                     nn_slopeLabel = [nn_slopeLabel;
-                        ones(size(data.raw.(dataName{n,m})(1:end-1,2:11),1),1)*...
-                             slopeMatrix(n,m)];
+                                     slopeMatrix(n,m)];
                          
                     name = [name;dataName{n,m}];
                     

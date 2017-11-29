@@ -1,10 +1,13 @@
 %% Preprocessing for Neuronal Network
 
-%% Load Data
+%% Limit for acceleration data
+lim = 0.1;
 
-trainData = load(trainDataName);
-testData = load(testDataName);
-valiData = load(valiDataName);
+%% cut away filter response in data
+cut = 20;
+
+%% feautre extraktion window
+window = 40;
 
 %% Choose witch sensordata to use as input
 % Column 1: Throttle
@@ -23,14 +26,11 @@ columns = [11 5 7]; % Set witch columns to use
 %columns = 1:11
 inputSize = size(columns,2);
 
-%% Limit for acceleration data
-lim = 0.3;
+%% Load Data
 
-%% cut away filter response in data
-cut = 20;
-
-%% feautre extraktion window
-window = 80;
+testData = load(testDataName);
+valiData = load(valiDataName);
+trainData = load(trainDataName);
 
 %% get new vectors for input and output
 for n = 1:inputSize
@@ -52,7 +52,7 @@ for n = 1:size(trainData.StartStop,1)
     start = trainData.StartStop(n,1);
     stop = trainData.StartStop(n,2);
     
-    [in,out,newLength] =... 
+    [in,out,~] =... 
     limitData(tempTrainInput(start:stop,:),...
               tempTrainOutput(start:stop,:),lim);
     
@@ -215,6 +215,5 @@ output_features = [trainData.OutputFeautures;
 
 clear nn_input nn_output nn_loadLabel nn_slopeLabel tempFilter
 
-%[input_features,output_features] = featureExtraction(input,output,40,true);
 
 

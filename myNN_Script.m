@@ -44,7 +44,7 @@ net.plotFcns = {'plotperform','plottrainstate','ploterrhist', ...
     'plotregression', 'plotfit'};
 
 %% set another output function
-net.layers{2}.transferFcn = 'tansig';
+%net.layers{2}.transferFcn = 'tansig';
 
 % Train the Network
 [net,tr] = train(net,x,t,'useParallel','yes','showResources','yes');
