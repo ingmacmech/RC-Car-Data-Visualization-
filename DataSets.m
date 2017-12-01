@@ -81,7 +81,16 @@ dataName = {'Test51_0g_TiefGarageLuzern_1';
             'Test47_1000g_TiefGarageLuzern_3';
             'Test47_1000g_TiefGarageLuzern_4';
             'Test47_1000g_TiefGarageLuzern_5';
-            'Test47_1000g_TiefGarageLuzern_6'
+            'Test47_1000g_TiefGarageLuzern_6';%
+            'Test47_1000g_TiefGarageLuzern_11';
+            'Test49_400g_TiefGarageLuzern_11';
+            'Test49_400g_TiefGarageLuzern_12';
+            'Test49_400g_TiefGarageLuzern_13';
+            'Test50_200g_TiefGarageLuzern_11';
+            'Test50_200g_TiefGarageLuzern_12';
+            'Test51_0g_TiefGarageLuzern_11';
+            'Test51_0g_TiefGarageLuzern_12';
+            'Test51_0g_TiefGarageLuzern_13'
             };
         
 loadMatrix = [ 0;
@@ -119,7 +128,16 @@ loadMatrix = [ 0;
                1000;
                1000;
                1000;
-               1000
+               1000;
+               1000;
+               400;
+               400;
+               400;
+               200;
+               200;
+               0;
+               0;
+               0;
                ];
    
 slopeMatrix = [0;
@@ -149,6 +167,15 @@ slopeMatrix = [0;
                0;
                0;  
                0; 
+               0; 
+               0; 
+               0;
+               0;
+               0;  
+               0; 
+               0; 
+               0; 
+               0;
                0; 
                0; 
                0;
@@ -198,7 +225,12 @@ dataName = {'Test51_0g_TiefGarageLuzern_7';
             'Test49_400g_TiefGarageLuzern_7';
             'Test48_600g_TiefGarageLuzern_7';
             'Test46_800g_TiefGarageLuzern_7';
-            'Test47_1000g_TiefGarageLuzern_7'
+            'Test47_1000g_TiefGarageLuzern_7';
+            'Test47_1000g_TiefGarageLuzern_10';
+            'Test48_600g_TiefGarageLuzern_10';
+            'Test49_400g_TiefGarageLuzern_10';
+            'Test50_200g_TiefGarageLuzern_10';
+            'Test51_0g_TiefGarageLuzern_10'
             };
        
 loadMatrix = [ 0;
@@ -206,7 +238,12 @@ loadMatrix = [ 0;
                400;
                600;
                800;
-               1000
+               1000;
+               1000;
+               600;
+               400;
+               200;
+               0
                ];
    
 slopeMatrix = [0;
@@ -214,7 +251,12 @@ slopeMatrix = [0;
                0;
                0;
                0;
-               0 
+               0;
+               0;
+               0;
+               0;
+               0;
+               0
                ];
                 
 save('dataSet_Test_1.mat','dataName','loadMatrix','slopeMatrix');

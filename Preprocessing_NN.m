@@ -7,7 +7,7 @@ lim = 0.1;
 cut = 20;
 
 %% feautre extraktion window
-window = 40;
+window = 80;
 
 %% Choose witch sensordata to use as input
 % Column 1: Throttle
@@ -132,6 +132,76 @@ for n = 1:size(testData.StartStop,1)
         nSamples = nSamples + size(tempFilterIn,1);
         tempStartStop = [tempStartStop;...
                       [tempStartStop(size(tempStartStop,1),2)+1,nSamples]];
+    end
+    
+    if(plotInputFeautures == true)
+        figure('units','normalized','outerposition',[0 0 1 1])
+        
+        subplot(4,1,1)
+        hold on
+        plot(tempFeatIn(:,1))
+        hold off
+        
+        subplot(4,1,2)
+        hold on
+        plot(tempFeatIn(:,2))
+        hold off
+        
+        subplot(4,1,3)
+        hold on
+        plot(tempFeatIn(:,3))
+        hold off
+        
+        subplot(4,1,4)
+        hold on
+        plot(tempFeatIn(:,4))
+        hold off
+        
+        figure('units','normalized','outerposition',[0 0 1 1])
+        
+        subplot(4,1,1)
+        hold on
+        plot(tempFeatIn(:,5))
+        hold off
+        
+        subplot(4,1,2)
+        hold on
+        plot(tempFeatIn(:,6))
+        hold off
+        
+        subplot(4,1,3)
+        hold on
+        plot(tempFeatIn(:,7))
+        hold off
+        
+        subplot(4,1,4)
+        hold on
+        plot(tempFeatIn(:,8))
+        hold off
+        
+        figure('units','normalized','outerposition',[0 0 1 1])
+        
+        subplot(4,1,1)
+        hold on
+        plot(tempFeatIn(:,9))
+        hold off
+        
+        subplot(4,1,2)
+        hold on
+        plot(tempFeatIn(:,10))
+        hold off
+        
+        subplot(4,1,3)
+        hold on
+        plot(tempFeatIn(:,11))
+        hold off
+        
+        subplot(4,1,4)
+        hold on
+        plot(tempFeatIn(:,12))
+        hold off
+        
+        
     end
 end
 

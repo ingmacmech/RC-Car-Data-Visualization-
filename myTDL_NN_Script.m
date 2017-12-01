@@ -7,8 +7,8 @@
 %   input - input time series.
 %   output - target time series.
 
-X = tonndata(input,false,false);
-T = tonndata(output,false,false);
+X = tonndata(input_features,false,false);
+T = tonndata(output_features,false,false);
 
 % Choose a Training Function
 % For a list of all training functions type: help nntrain
@@ -18,14 +18,14 @@ T = tonndata(output,false,false);
 trainFcn = 'trainscg';  
 
 % Create a Time Delay Network
-inputDelays = 1:120;
-hiddenLayerSize = 5000;
+inputDelays = 1:10;
+hiddenLayerSize = 150;
 net = timedelaynet(inputDelays,hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
 % For a list of all processing functions type: help nnprocess
-net.input.processFcns = {'removeconstantrows'};
-net.output.processFcns = {'removeconstantrows'};
+net.input.processFcns = {'mapminmax'};
+net.output.processFcns = {'mapminmax'};
 
 % Prepare the Data for Training and Simulation
 % The function PREPARETS prepares timeseries data for a particular network,
@@ -53,7 +53,7 @@ net.plotFcns = {'plotperform','plottrainstate', 'ploterrhist', ...
     'plotregression', 'plotresponse', 'ploterrcorr', 'plotinerrcorr'};
 
 % Train the Network
-[net,tr] = train(net,x,t,xi,ai);
+[net,tr] = train(net,x,t,xi,ai,'useParallel','yes','showResources','yes');
 
 % Test the Network
 y = net(x,xi,ai);
@@ -114,7 +114,7 @@ if (true)
     genFunction(net,'myTDL_Function_','MatrixOnly','yes');
     x1 = cell2mat(x(1,:));
     xi1 = cell2mat(xi(1,:));
-    nn_output = myTDL_Function_(x1,xi1);
+    nn_output = myTDL_Function_(x1,xi1)';
 end
 if (false)
     % Generate a Simulink diagram for simulation or deployment with.

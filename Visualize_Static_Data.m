@@ -401,7 +401,10 @@ annotation('textbox', [0 0.9 1 0.1], ...
                'FontSize',12, 'FontWeight', 'bold','interpreter','none')
 
 hold on
-plot(loadValue,targetPitchAngle,'')
+plot(loadValue,targetPitchAngle,'+b')
+plot(loadValue,linearModel.Fitted,'--r')
+plot(loadValue, 0.003592727272727*loadValue,'-g')
+hold off
 
 %% Plot estimation of pitch angle without acceleration offset correction
 figure('units','normalized','outerposition',[0 0 1 1])

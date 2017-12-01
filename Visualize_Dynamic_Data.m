@@ -20,8 +20,8 @@ orginalOverlay = false;
 
 plotTimeData        = false;
 plotPotiData        = false;
-plotPitchAngle      = true;
-plotSpeedData       = true;
+plotPitchAngle      = false;
+plotSpeedData       = false;
 plotGforceScatter   = false;
 plotControllAccData = false;
 plotAccVsControl    = false;

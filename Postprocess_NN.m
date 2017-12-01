@@ -5,6 +5,13 @@
 m = inputSize;
 nFeatu = 4;
 labelString = {'mu ','sigma ','min ','max '};
+loadFaktor = 0.003592727272727^(-1);
+
+if(TDL == true)
+    delay = size(inputDelays,2);
+else
+    delay = 0;
+end
 
 figure('units','normalized','outerposition',[0 0 1 1])
     [~,ax] = plotmatrix(input_features);
@@ -37,8 +44,8 @@ testData.Pitch.Estimated = [];
 testData.Pitch.Measured = [];
 for n = 1 : size(testData.StartStopFeautres,1)
     
-    start = testData.Offset + testData.StartStopFeautres(n,1);
-    stop = testData.Offset + testData.StartStopFeautres(n,2);
+    start = testData.Offset + testData.StartStopFeautres(n,1); 
+    stop = testData.Offset + testData.StartStopFeautres(n,2)- delay;
     
     muMes = mean(output_features(start:stop,1));
     stdMes = std(output_features(start:stop,1));
@@ -79,7 +86,7 @@ valiData.Pitch.Measured = [];
 for n = 1 : size(valiData.StartStopFeautres,1)
     
     start = valiData.Offset + valiData.StartStopFeautres(n,1);
-    stop = valiData.Offset + valiData.StartStopFeautres(n,2);
+    stop = valiData.Offset + valiData.StartStopFeautres(n,2)- delay;
     
     muMes = mean(output_features(start:stop,1));
     stdMes = std(output_features(start:stop,1));
@@ -124,7 +131,7 @@ hold on
 for n = 1 : size(valiData.StartStopFeautres,1)
     
     start = valiData.Offset + valiData.StartStopFeautres(n,1);
-    stop = valiData.Offset + valiData.StartStopFeautres(n,2);
+    stop = valiData.Offset + valiData.StartStopFeautres(n,2)- delay;
     
     valiDataInfo = [valiDataInfo;
                 num2str(valiData.Load(n))];
@@ -171,7 +178,7 @@ hold on
 for n = 1 : size(testData.StartStopFeautres,1)
     
     start = testData.Offset + testData.StartStopFeautres(n,1);
-    stop = testData.Offset + testData.StartStopFeautres(n,2);
+    stop = testData.Offset + testData.StartStopFeautres(n,2)- delay;
     
     testDataInfo = [testDataInfo;
                     num2str(testData.Load(n))];
@@ -210,3 +217,101 @@ ylabel('Pitch angle (°)')
 legend('NN Estimation','Target Value')
 title('Test-Data Results')
 ylim([-1 7])
+
+
+%% Errorbar plot for test and validation data converted in mass
+figure('units','normalized','outerposition',[0 0 1 1])
+valiDataInfo = {''};
+testDataInfo = {''};
+
+subplot(1,2,1)
+hold on
+for n = 1 : size(valiData.StartStopFeautres,1)
+    
+    start = valiData.Offset + valiData.StartStopFeautres(n,1);
+    stop = valiData.Offset + valiData.StartStopFeautres(n,2)- delay;
+    
+    valiDataInfo = [valiDataInfo;
+                num2str(valiData.Load(n))];
+    
+    if(n == 1)
+         
+         errorbar(n,valiData.Pitch.Estimated(n,1)*loadFaktor,...
+                  valiData.Pitch.Estimated(n,2)*loadFaktor,...
+                  'or',...
+                  'HandleVisibility','on')
+              
+         errorbar(n,valiData.Pitch.Measured(n,1)*loadFaktor,...
+               valiData.Pitch.Measured(n,2)*loadFaktor,...
+               'ob',...
+               'HandleVisibility','on')
+           
+    else
+        errorbar(n,valiData.Pitch.Estimated(n,1)*loadFaktor,...
+                   valiData.Pitch.Estimated(n,2)*loadFaktor,...
+                  'or',...
+                  'HandleVisibility','off')
+        errorbar(n,valiData.Pitch.Measured(n,1)*loadFaktor,...
+                   valiData.Pitch.Measured(n,2)*loadFaktor,...
+                   'ob',...
+                   'HandleVisibility','off')
+    end
+   
+end
+hold off
+
+xticks(0:n+1)
+set(gca,'XtickLabel',valiDataInfo)
+xlim([0 n+1])
+grid minor
+grid on
+xlabel('Load Condition(gr)')
+ylabel('Estimated mass (gr)')
+legend('NN Estimation','Target Value')
+title('Validation-Data Results')
+ylim([0 1600])
+
+subplot(1,2,2)
+hold on
+for n = 1 : size(testData.StartStopFeautres,1)
+    
+    start = testData.Offset + testData.StartStopFeautres(n,1);
+    stop = testData.Offset + testData.StartStopFeautres(n,2)- delay;
+    
+    testDataInfo = [testDataInfo;
+                    num2str(testData.Load(n))];
+    
+    if(n == 1)
+        errorbar(n,testData.Pitch.Estimated(n,1)*loadFaktor,...
+                  testData.Pitch.Estimated(n,2)*loadFaktor,...
+                  'or',...
+                  'HandleVisibility','on')
+         errorbar(n,testData.Pitch.Measured(n,1)*loadFaktor,...
+               testData.Pitch.Measured(n,2)*loadFaktor,...
+               'ob',...
+               'HandleVisibility','on')
+    else
+        
+        errorbar(n,testData.Pitch.Estimated(n,1)*loadFaktor,...
+                  testData.Pitch.Estimated(n,2)*loadFaktor,...
+                  'or',...
+                  'HandleVisibility','off')
+        errorbar(n,testData.Pitch.Measured(n,1)*loadFaktor,...
+                   testData.Pitch.Measured(n,2)*loadFaktor,...
+                   'ob',...
+                   'HandleVisibility','off')
+    end
+   
+end
+hold off
+
+xticks(0:n+1)
+set(gca,'XtickLabel',testDataInfo)
+xlim([0 n+1])
+grid minor
+grid on
+xlabel('Load Condition (gr)')
+ylabel('Estimated Load (gr)')
+legend('NN Estimation','Target Value')
+title('Test-Data Results')
+ylim([0 1600])
