@@ -18,7 +18,7 @@ t = output_features';
 trainFcn = 'trainlm';  % Levenberg-Marquardt backpropagation.
 
 % Create a Fitting Network
-hiddenLayerSize = [180];
+hiddenLayerSize = [100 50 25];
 net = fitnet(hiddenLayerSize,trainFcn); %fitnet
 
 % Choose Input and Output Pre/Post-Processing Functions

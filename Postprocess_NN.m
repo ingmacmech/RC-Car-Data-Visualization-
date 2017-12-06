@@ -315,3 +315,64 @@ ylabel('Estimated Load (gr)')
 legend('NN Estimation','Target Value')
 title('Test-Data Results')
 ylim([0 1600])
+
+%% Errorbar plot for cross data 
+figure('units','normalized','outerposition',[0 0 1 1])
+crossDataInfo = {''};
+crossData.Pitch.Estimated = [];
+crossData.Pitch.Measured = [];
+hold on
+for n = 1 : size(crossData.StartStopFeautres,1)
+    
+    start = crossData.StartStopFeautres(n,1);
+    stop = crossData.StartStopFeautres(n,2)- delay;
+    
+    muMes = mean(crossData.OutputFeautures(start:stop,1));
+    stdMes = std(crossData.OutputFeautures(start:stop,1));
+    muEst = mean(nn_cross_output(start:stop,1));
+    stdEst = std(nn_cross_output(start:stop,1));
+    
+    crossData.Pitch.Estimated = [crossData.Pitch.Estimated;
+                      [muEst,stdEst] ];
+    crossData.Pitch.Measured = [crossData.Pitch.Measured;
+                      [muMes,stdMes] ];
+    
+    crossDataInfo = [crossDataInfo;
+                num2str(crossData.Load(n))];
+    
+    if(n == 1)
+         
+         errorbar(n,crossData.Pitch.Estimated(n,1),...
+                  crossData.Pitch.Estimated(n,2),...
+                  'or',...
+                  'HandleVisibility','on')
+              
+         errorbar(n,crossData.Pitch.Measured(n,1),...
+               crossData.Pitch.Measured(n,2),...
+               'ob',...
+               'HandleVisibility','on')
+           
+    else
+        errorbar(n,crossData.Pitch.Estimated(n,1),...
+                   crossData.Pitch.Estimated(n,2),...
+                  'or',...
+                  'HandleVisibility','off')
+        errorbar(n,crossData.Pitch.Measured(n,1),...
+                   crossData.Pitch.Measured(n,2),...
+                   'ob',...
+                   'HandleVisibility','off')
+    end
+   
+end
+hold off
+
+xticks(0:n+1)
+set(gca,'XtickLabel',crossDataInfo)
+xlim([0 n+1])
+grid minor
+grid on
+xlabel('Load Condition')
+ylabel('Pitch angle (°)')
+legend('NN Estimation','Target Value')
+title('Cross-Data Results')
+ylim([-1 7])

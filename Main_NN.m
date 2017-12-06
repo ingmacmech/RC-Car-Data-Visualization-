@@ -5,11 +5,13 @@ clc
 
 %% Controlls
 
-trainDataName = 'nn_Train_1.mat';
-testDataName = 'nn_Test_1.mat';
-valiDataName = 'nn_Vali_1.mat';
+trainDataName = 'nn_Train_2.mat';
+testDataName = 'nn_Test_2.mat';
+valiDataName = 'nn_Vali_2.mat';
 
-learning = false;
+crossDataName = 'nn_CrossTest_2.mat';
+
+learning = true;
 TDL = false;
 plotInputFeautures = false;
 
@@ -34,6 +36,17 @@ else
     end  
     
 end
+
+%% Allways compute the cross output with a neuronal net
+if TDL == true
+        X = tonndata(crossData.InputFeautures,false,false);
+        T = tonndata(crossData.OutputFeautures,false,false);
+        [x,xi,ai,t] = preparets(net,X,T);
+        nn_cross_output = myTDL_Function_(x,xi)';
+    else 
+        nn_cross_output = myFF_Function_(crossData.InputFeautures')';
+end  
+
 
 
 % Postprocess output of Neuronal Network
