@@ -33,12 +33,12 @@ dataName = {'Cal4_Pitch_Angle_0g';
             'Cal4_Pitch_Angle_1000g'};
 
 dataInfo = {'';
-            'Loaded 0g';
-            'Loaded 200g';
-            'Loaded 400g';
-            'Loaded 600g';
-            'Loaded 800g';
-            'Loaded 1000g'};
+            '0g';
+            '200g';
+            '400g';
+            '600g';
+            '800g';
+            '1000g'};
         
 targetPitchAngle = [0 0.62 1.49 2.36 2.86 3.48];
 loadValue = [0 200 400 600 800 1000];
@@ -401,10 +401,15 @@ annotation('textbox', [0 0.9 1 0.1], ...
                'FontSize',12, 'FontWeight', 'bold','interpreter','none')
 
 hold on
-plot(loadValue,targetPitchAngle,'+b')
+plot(loadValue,targetPitchAngle,'-*b')
 plot(loadValue,linearModel.Fitted,'--r')
-plot(loadValue, 0.003592727272727*loadValue,'-g')
+%plot(loadValue, 0.003592727272727*loadValue,'-g')
 hold off
+grid on
+grid minor
+xlabel('Beladungszustand (g)')
+ylabel('Nickwinkel (°)')
+legend('Gemessen','Lineares Model')
 
 %% Plot estimation of pitch angle without acceleration offset correction
 figure('units','normalized','outerposition',[0 0 1 1])

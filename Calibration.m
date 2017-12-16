@@ -2,7 +2,7 @@ clear;
 clc;
 close all;
 
-
+savePlots = true;
 %% Add Cal_Data Path
 currentPath = pwd;
 addpath(genpath(currentPath));
@@ -185,26 +185,39 @@ cal.potiFR.polyVal = [aPotiFR bPotiFR];
 cal.potiHL.polyVal = [aPotiHL bPotiHL];
 cal.potiHR.polyVal = [aPotiHR bPotiHR];
 
+figure('units','normalized','outerposition',[0 0 1 1])
+hold on
+plot(potiValueFL,springTravelV,'-*b')
+plot(min(potiValueFL):max(potiValueFL),fitPotiFL,'--r')
+hold off
+grid minor
+grid on
+xlabel('ADC-Wert Poti (-)')
+ylabel('Federweg (mm)')
+legend('Gemessen','Lineares Model','Location','northwest')
+ylim([-5 50])
+
 
 figure('units','normalized','outerposition',[0 0 1 1])
 
-annotation('textbox', [0 0.9 1 0.1], ...
-               'String',...
-               'Potentiometer Calibration',...
-               'EdgeColor', 'none', ...
-               'HorizontalAlignment', 'center',...
-               'FontSize',12, 'FontWeight', 'bold','interpreter','none')
+% annotation('textbox', [0 0.9 1 0.1], ...
+%                'String',...
+%                'Potentiometer Calibration',...
+%                'EdgeColor', 'none', ...
+%                'HorizontalAlignment', 'center',...
+%                'FontSize',12, 'FontWeight', 'bold','interpreter','none')
 subplot(2,2,1)
 hold on
 plot(potiValueFL,springTravelV,'-*b')
 plot(min(potiValueFL):max(potiValueFL),fitPotiFL,'--r')
 hold off
 grid minor
+grid on
 xlabel('ADC Poti Value (-)')
 ylabel('\Delta Spring Travel (mm)')
 title('Calibration potentiometer front left')
 legend('measured','fitted','Location','northwest')
-
+ylim([-5 50])
 
 subplot(2,2,2)
 hold on
@@ -212,10 +225,12 @@ plot(potiValueFR,springTravelV,'-*b')
 plot(min(potiValueFR):max(potiValueFR),fitPotiFR,'--r')
 hold off
 grid minor
+grid on
 xlabel('ADC Poti Value (-)')
 ylabel('\Delta Spring Travel (mm)')
 title('Calibration potentiometer front right')
 legend('measured','fitted','Location','northwest')
+ylim([-5 50])
 
 subplot(2,2,3)
 hold on
@@ -223,10 +238,12 @@ plot(potiValueHL,springTravelH,'-*b')
 plot(min(potiValueHL):max(potiValueHL),fitPotiHL,'--r')
 hold off
 grid minor
+grid on
 xlabel('ADC Poti Value (-)')
 ylabel('\Delta Spring Travel (mm)')
 title('Calibration potentiometer rear left')
 legend('measured','fitted','Location','northwest')
+ylim([-5 50])
 
 subplot(2,2,4)
 hold on
@@ -234,10 +251,21 @@ plot(potiValueHR,springTravelH,'-*b')
 plot(min(potiValueHR):max(potiValueHR),fitPotiHR,'--r')
 hold off
 grid minor
+grid on
 xlabel('ADC Poti Value (-)')
 ylabel('\Delta Spring Travel (mm)')
 title('Calibration potentiometer rear right')
 legend('measured','fitted','Location','northwest')
+ylim([-5 50])
+
+if(savePlots == true)
+    h = gcf;
+    set(h, 'PaperOrientation','landscape');
+    set(h,'PaperUnits' ,'normalized');
+    set(h, 'PaperPosition', [0 0 1 1]);
+    print(gcf, '-dpdf', 'Poti_Kal')
+end
+
 
 %% Load Calibration file and separate vectors 
 calDataControll = load('CalData_Stearing_Throttle.txt');

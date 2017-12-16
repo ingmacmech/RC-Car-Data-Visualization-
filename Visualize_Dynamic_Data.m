@@ -11,7 +11,7 @@ savePCA = false;
 namePCA = 'nn_data.mat';
 
 saveNN = true;
-nameNN = 'nn_Train_2.mat';
+nameNN = 'nn_Vali_1.mat';
 
 nColumns = 15;              % The number of columns in the data file + 1
 
@@ -20,7 +20,7 @@ orginalOverlay = false;
 
 plotTimeData        = false;
 plotPotiData        = false;
-plotPitchAngle      = true;
+plotPitchAngle      = false;
 plotSpeedData       = false;
 plotGforceScatter   = false;
 plotControllAccData = false;
@@ -42,7 +42,7 @@ load('cal');
 dataType = {'.txt'};
 
 % dataSet_1: Includes only data with slope = 0 and weight 0g and 900g
-load('dataSet_Train_2.mat');
+load('dataSet_Vali_1.mat');
 
 nFiles = size(dataName,1);  % How many plots
 mFiles = size(dataName,2);  % How many coparisson data in one plot

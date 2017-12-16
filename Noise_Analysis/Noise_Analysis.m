@@ -497,3 +497,30 @@ plot(t_ax,ax_sensorFilt)
 plot(t_ax,ax)
 hold off
 
+%% Plot spectrum ax and ax Sensor
+figure()
+
+subplot(2,1,1)
+hold on
+plot(t_ax,ax_sensor)
+plot(t_ax,ax_sensorFilt)
+hold off
+grid on
+grid minor
+title('Vergleich')
+xlabel('Zeit (s)')
+ylabel('Beschleunigung (g)')
+
+        
+        
+        
+subplot(2,1,2)
+hold on
+plot(f_ax,P1_axSensor)
+plot(f_ax,P1_ax)
+
+hold off
+
+title('Amplituden Spektrum')
+xlabel('f (Hz)')
+ylabel('|P1(f)|')

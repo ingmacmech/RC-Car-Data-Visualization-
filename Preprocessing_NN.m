@@ -7,7 +7,7 @@ lim = 0.2;
 cut = 10;
 
 %% feautre extraktion window
-window = 40;
+window = 100;
 
 %% Choose witch sensordata to use as input
 % Column 1: Throttle
