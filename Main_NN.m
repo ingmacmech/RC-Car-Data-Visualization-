@@ -9,9 +9,9 @@ trainDataName = 'nn_Train_2.mat';
 testDataName = 'nn_Test_2.mat';
 valiDataName = 'nn_Vali_2.mat';
 
-crossDataName = 'nn_CrossTest_2.mat';
+crossDataName = 'nn_Train_1.mat';
 
-learning = true;
+learning = false;
 TDL = false;
 plotInputFeautures = false;
 
